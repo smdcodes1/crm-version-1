@@ -1,0 +1,192 @@
+/* Global Modal Overlay */
+.crm-modal-root {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; */
+}
+
+/* Backdrop with blur */
+.crm-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1001;
+}
+
+.crm-modal-backdrop.crm-active {
+    opacity: 1;
+}
+
+/* Modal Container Card */
+.crm-modal-card {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 1002;
+    overflow: hidden;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+    transition: opacity 0.18s ease-out, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.crm-modal-card.crm-active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Max-width Variants */
+.crm-modal-sm {
+    max-width: 384px;
+}
+
+.crm-modal-md {
+    max-width: 448px;
+}
+
+.crm-modal-lg {
+    max-width: 512px;
+}
+
+.crm-modal-xl {
+    max-width: 576px;
+}
+
+.crm-modal-2xl {
+    max-width: 672px;
+}
+
+.crm-modal-3xl {
+    max-width: 768px;
+}
+
+.crm-modal-4xl {
+    max-width: 896px;
+}
+
+/* Header */
+.crm-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    background-color: #ffffff;
+}
+
+.crm-modal-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.crm-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.16px;
+}
+
+.crm-modal-subtitle {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Close Button */
+.crm-modal-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.crm-modal-close-btn:hover {
+    color: #334155;
+    background-color: #f1f5f9;
+}
+
+/* Modal Body */
+.crm-modal-body {
+    padding: 24px;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #334155;
+    font-size: 14.4px;
+    line-height: 1.5;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+    .crm-modal-root {
+        padding: 12px;
+        align-items: flex-end;
+    }
+
+    .crm-modal-card {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        max-width: 100% !important;
+        margin: 0;
+    }
+
+    .crm-modal-header {
+        padding: 16px 20px;
+    }
+
+    .crm-modal-body {
+        padding: 20px;
+        max-height: 75vh;
+    }
+}
+
+@media print {
+    .crm-modal-root {
+        display: inline !important;
+        /* Removes modal wrapper from layout calculation */
+    }
+
+    .crm-modal-card,
+    .crm-modal-body {
+        display: block !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .crm-modal-backdrop,
+    .crm-modal-header,
+    .crm-modal-close-btn {
+        display: none !important;
+    }
+
+}

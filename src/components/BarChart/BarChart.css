@@ -1,0 +1,283 @@
+    .chart-card {
+        background: #ffffff;
+        border: 1px solid #eef2f6;
+        border-radius: 16px;
+        padding: 28px 32px;
+        max-width: 1400px;
+        margin: 0 auto;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Header Section */
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 32px;
+        gap: 16px;
+    }
+
+    .chart-title-group h2 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .chart-title-group p {
+        font-size: 14px;
+        font-weight: 400;
+        color: #64748b;
+    }
+
+    /* Legend */
+    .chart-legend {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #475569;
+    }
+
+    .legend-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+    }
+
+    .legend-closed-won {
+        background-color: #7c3aed;
+    }
+
+    .legend-pipeline {
+        background-color: #ebdcfd;
+    }
+
+    /* Chart Canvas Area */
+    .chart-body {
+        position: relative;
+        height: 320px;
+        display: flex;
+    }
+
+    /* Y-Axis Labels & Grid Lines */
+    .y-axis-labels {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 60px;
+        padding-bottom: 28px;
+    }
+
+    .y-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #94a3b8;
+        text-align: right;
+        padding-right: 12px;
+    }
+
+    .grid-container {
+        position: relative;
+        flex-grow: 1;
+        height: 100%;
+    }
+
+    .grid-lines {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        pointer-events: none;
+    }
+
+    .grid-line {
+        width: 100%;
+        border-bottom: 1px dashed #f1f5f9;
+    }
+
+    .grid-line:last-child {
+        border-bottom: 1.5px solid #cbd5e1;
+    }
+
+    /* Bars Area */
+    .bars-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        padding-bottom: 28px;
+    }
+
+    .month-group {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        justify-content: flex-end;
+        /* cursor: pointer; */
+        flex: 1;
+        max-width: 120px;
+    }
+
+    /* Hover indicator line */
+    .hover-line {
+        position: absolute;
+        top: 0;
+        bottom: 28px;
+        width: 1px;
+        background-color: #e2e8f0;
+        z-index: 1;
+    }
+
+    .bars-pair {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 100%;
+        z-index: 2;
+    }
+
+    .bar {
+        width: 28px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+    }
+
+    .bar-pipeline {
+        background-color: #ebdcfd;
+    }
+
+    .bar-closed-won {
+        background-color: #7c3aed;
+    }
+
+    .bar-revenue {
+        background: linear-gradient(to bottom, rgba(219, 234, 254, 0.1), rgba(96, 165, 250, 0.8));
+    }
+
+    .legend-revenue {
+        background-color: #60a5fa;
+    }
+
+    .month-label {
+    
+        position: absolute;
+        bottom: -25px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #94a3b8;
+    }
+
+    /* Tooltip */
+    .chart-tooltip {
+        position: absolute;
+        top: 32%;
+        left: 55%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 1px solid #eef2f6;
+        border-radius: 12px;
+        padding: 12px 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        z-index: 10;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    .tooltip-month {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+
+    .tooltip-row {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+
+    .tooltip-closed {
+        color: #7c3aed;
+    }
+
+    .tooltip-pipeline {
+        color: #c4b5fd;
+    }
+
+    .tooltip-revenue {
+        color: #60a5fa;
+    }
+    
+    /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+          .chart-card {
+            padding: 24px 20px;
+          }
+          .bar {
+            width: 22px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .chart-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+          }
+          .bar {
+            width: 16px;
+            gap: 4px;
+          }
+          .bars-pair {
+            gap: 4px;
+          }
+          .y-axis-labels {
+            width: 48px;
+          }
+          .y-label {
+            font-size: 11px;
+            padding-right: 6px;
+          }
+          .month-label {
+            font-size: 11px;
+          }
+          .chart-body {
+            height: 280px;
+          }
+        }
+
+        @media (max-width: 480px) {
+        
+          .chart-card {
+            padding: 18px 12px;
+            border-radius: 12px;
+          }
+          .bar {
+            width: 12px;
+          }
+          .bars-pair {
+            gap: 2px;
+          }
+          .chart-body {
+            height: 240px;
+          }
+        }

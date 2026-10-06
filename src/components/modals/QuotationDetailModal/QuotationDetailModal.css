@@ -1,0 +1,411 @@
+/* Quotation Detail Modal Specifics */
+.qdm-space-y {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Top Action Bar */
+.qdm-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.qdm-status-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.qdm-status-select {
+  font-size: 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: 500;
+  color: #1e293b;
+  outline: none;
+  cursor: pointer;
+}
+
+.qdm-status-select:focus {
+  border-color: #7c3aed;
+}
+
+.qdm-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qdm-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.qdm-btn-outline:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.qdm-invoiced-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.qdm-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: #7c3aed;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.15s ease;
+}
+
+.qdm-btn-primary:hover {
+  background-color: #6d28d9;
+}
+
+/* Printable Document Container */
+.qdm-document {
+  padding: 24px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.qdm-doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 20px;
+  gap: 16px;
+}
+
+.qdm-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qdm-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #7c3aed;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.qdm-company-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.qdm-subtext {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+.qdm-quote-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qdm-quote-num {
+  font-size: 1.15rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  color: #6d28d9;
+}
+
+.qdm-meta-date {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Recipient Info */
+.qdm-recipient-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qdm-label-caps {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.qdm-client-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Line Items Table */
+.qdm-table-container {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.qdm-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.qdm-table thead {
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+  font-weight: 600;
+}
+
+.qdm-table th,
+.qdm-table td {
+  padding: 10px 14px;
+}
+
+.qdm-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.qdm-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.qdm-table tbody tr:hover {
+  background-color: rgba(248, 250, 252, 0.5);
+}
+
+.qdm-col-num {
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  width: 40px;
+}
+
+.qdm-col-service {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.qdm-col-desc {
+  color: #64748b;
+}
+
+.qdm-col-center {
+  text-align: center;
+}
+
+.qdm-col-right {
+  text-align: right;
+}
+
+/* Bottom Details & Totals */
+.qdm-bottom-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.qdm-terms-card {
+  font-size: 0.75rem;
+  color: #475569;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.qdm-totals-card {
+  width: 250px;
+  background-color: rgba(248, 250, 252, 0.8);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.qdm-total-row {
+  display: flex;
+  justify-content: space-between;
+  color: #475569;
+}
+
+.qdm-grand-total {
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+@media (max-width: 768px) {
+  .qdm-action-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .qdm-action-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .qdm-doc-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .qdm-quote-meta {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .qdm-bottom-section {
+    flex-direction: column;
+  }
+
+  .qdm-totals-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .qdm-cell-hide-sm {
+    display: none;
+  }
+}
+
+/* Print Media Styles */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* .qdm-action-bar {
+    display: block !important;
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  } */
+
+  .qdm-action-bar {
+    display: none !important;
+  }
+
+  #quotation-document,
+  #quotation-document * {
+    visibility: visible !important;
+  }
+
+  #quotation-document {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 10mm 12mm !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #quotation-document>* {
+    margin-bottom: 12px !important;
+  }
+
+  #quotation-document>*:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .qdm-doc-header {
+    padding-bottom: 12px !important;
+  }
+
+  .qdm-table th,
+  .qdm-table td {
+    padding: 6px 10px !important;
+  }
+
+  /* .qdm-bottom-section,
+  .qdm-totals-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  } */
+
+  /* 5. Force standard page setup and margins */
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+}

@@ -1,0 +1,95 @@
+.stat-card {
+          background: #ffffff;
+          border: 1px solid #eef2f6;
+          border-radius: 16px;
+          padding: 22px 24px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+/* Header (Title & Icon) */
+.stat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.stat-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #8a99ad;
+    text-transform: uppercase;
+}
+/* Icon Wrapper Variants */
+.stat-card-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card-icon-wrapper.purple {
+    background-color: #f3effe;
+    color: #8b5cf6;
+}
+
+.stat-card-icon-wrapper.blue {
+    background-color: #eff6ff;
+    color: #3b82f6;
+}
+
+.stat-card-icon-wrapper.green {
+    background-color: #ecfdf5;
+    color: #10b981;
+}
+
+.stat-card-icon-wrapper.red {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+/* .stat-card-icon-wrapper.empty {
+    background-color: #0000;
+    color: #0000;
+} */
+ 
+/* Stat Value */
+.stat-card-value {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #0f172a;
+    margin-bottom: 14px;
+}
+/* Subtitle */
+.stat-card-subtitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+}
+/* Responsive Breakpoints */
+
+@media (max-width: 1024px) {
+  .stat-card-value {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+   
+    .stat-card {
+    padding: 18px 20px;
+    }
+    .stat-card-value {
+    font-size: 28px;
+    margin-bottom: 10px;
+    }
+}
