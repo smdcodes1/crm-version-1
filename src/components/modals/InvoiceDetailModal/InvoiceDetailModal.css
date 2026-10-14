@@ -292,6 +292,17 @@
     color: #059669;
 }
 
+.idm-partial-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
 @media (max-width: 768px) {
     .idm-control-bar {
         flex-direction: column;

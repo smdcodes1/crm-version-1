@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-
+import Swal from 'sweetalert2';
 import { FileText, Plus, Search, Eye, Edit2, Trash2, Receipt, CheckCircle2, Clock, Check, Trophy } from 'lucide-react';
 import StatCard from '../../components/StatCard/StatCard';
 import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
@@ -10,110 +10,20 @@ import { formatDate, formatINR } from '../../utils/Formatters';
 import QuotationDetailModal from '../../components/modals/QuotationDetailModal/QuotationDetailModal';
 import CreateQuotationModal from '../../components/forms/CreateQuotationModal/CreateQuotationModal';
 import GenerateInvoiceModal from "../../components/forms/GenerateInvoiceModal/GenerateInvoiceModal";
-// const statsData = [
-//   {
-//     title: 'TOTAL QUOTATIONS',
-//     value: '4',
-//     subtitle: 'Issued proposals',
-//     icon: <DocumentIcon />,
-//     colorScheme: 'purple',
-//   },
-//   {
-//     title: 'ACCEPTED',
-//     value: '1',
-//     subtitle: 'Ready for invoicing',
-//     icon: <CheckCircleIcon />,
-//     colorScheme: 'green',
-//   },
-//   {
-//     title: 'PENDING / SENT',
-//     value: '1',
-//     subtitle: 'Awaiting client decision',
-//     icon: <ClockIcon />,
-//     colorScheme: 'red',
-//     valueColor: '#7c3aed',
-//   },
-//   {
-//     title: 'TOTAL QUOTATION VALUE ',
-//     value: '₹1,60,000',
-//     subtitle: 'Gross quoted amounts ',
-//     icon: <TrophyIcon />,
-//     colorScheme: 'blue',
-//   },
-// ];
-// const INITIAL_QUOTATIONS = [
-//   {
-//     id: 1,
-//     quotationNo: 'QT-0001',
-//     company: 'ABC Technologies',
-//     itemsCount: 2,
-//     date: '15 Aug 2026',
-//     validUntil: '15 Sept 2026',
-//     amount: '₹94,400',
-//     status: 'Rejected',
-//     isInvoiced: true
-//   },
-//   {
-//     id: 2,
-//     quotationNo: 'QT-0002',
-//     company: 'XYZ Ltd',
-//     itemsCount: 2,
-//     date: '14 Aug 2026',
-//     validUntil: '14 Sept 2026',
-//     amount: '₹53,100',
-//     status: 'Accepted',
-//     isInvoiced: true
-//   },
-//   {
-//     id: 3,
-//     quotationNo: 'QT-0003',
-//     company: 'HealthCare 360',
-//     itemsCount: 1,
-//     date: '12 Aug 2026',
-//     validUntil: '12 Sept 2026',
-//     amount: '₹1,77,000',
-//     status: 'Sent',
-//     isInvoiced: false
-//   },
-//   {
-//     id: 4,
-//     quotationNo: 'QT-0004',
-//     company: 'Demo Corp',
-//     itemsCount: 1,
-//     date: '5 Aug 2026',
-//     validUntil: '25 Aug 2026',
-//     amount: '₹1,12,100',
-//     status: 'Rejected',
-//     isInvoiced: false
-//   }
-// ];
-const SearchIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
+import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
+import { SearchIcon,ViewIcon,EditIcon,TrashIcon } from '../../components/StatCard/StatCard';
 
-const ViewIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-);
-const EditIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-  </svg>
-);
-const DeleteIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6"></polyline>
-    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-  </svg>
-);
-
+const yearOptions= ['Monthly','Quarterly','Halfly','Annually'];
 function QuotationsView() {
-  const { quotations, invoices, isCreateQuotationOpen, setIsCreateQuotationOpen, deleteQuotation } = useCRM();
+  const { quotations, invoices, isCreateQuotationOpen, setIsCreateQuotationOpen, deleteQuotation,fetchQuotationsByDate } = useCRM();
+  const [isLoading, setIsLoading]= useState(false);
+  const [yearFilter, setYearFilter]= useState('Monthly');
+  const [initialDate,setInitialDate]= useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate,setFinalDate]= useState(() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30);
+      return d.toISOString().split('T')[0];
+  });
   // const [quotations, setQuotations] = useState(INITIAL_QUOTATIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -122,42 +32,87 @@ function QuotationsView() {
   const [viewingQuotation, setViewingQuotation] = useState(null);
   const [invoiceGenQuotationId, setInvoiceGenQuotationId] = useState(null);
 
+ const isWithinFilter = (dateString, filter) => {
+    if (!dateString) return false;
+    const itemDate = new Date(dateString);
+    if (isNaN(itemDate.getTime())) return false;
+
+    const now = new Date();
+    const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
+
+    switch (filter) {
+        case 'Monthly':
+            return daysDifference <= 30;
+        case 'Quarterly':
+            return daysDifference <= 90;
+        case 'Halfly':
+            return daysDifference <= 180;
+        case 'Annually':
+            return daysDifference <= 365;
+        default:
+            return true;
+    }
+  };
+  const filteredQuotationsHeader = quotations.filter(q => isWithinFilter(q.quotationDate || q.createdAt, yearFilter));
   // Summary Metrics
-  const totalCount = quotations.length;
-  const acceptedCount = quotations.filter((q) => q.status === 'Approved').length;
-  const sentCount = quotations.filter((q) => q.status === 'Sent' || q.status === 'Draft').length;
-  const totalValue = quotations.reduce((sum, q) => sum + (q.total || 0), 0);
+  const totalCount = filteredQuotationsHeader.length;
+  const acceptedCount = filteredQuotationsHeader.filter((q) => q.status === 'Approved').length;
+  const sentCount = filteredQuotationsHeader.filter((q) => q.status === 'Sent' || q.status === 'Draft').length;
+  const totalValue = filteredQuotationsHeader.reduce((sum, q) => sum + (q.total || 0), 0);
 
-  // const filteredQuotations = useMemo(() => {
-  //   return quotations.filter((item) => {
-  //     const matchesFilter = statusFilter === 'All' || item.status === statusFilter;
-  //     const term = searchQuery.toLowerCase().trim();
-  //     const matchesSearch =
-  //       term === '' ||
-  //       item.quotationNo.toLowerCase().includes(term) ||
-  //       item.company.toLowerCase().includes(term) ||
-  //       item.date.toLowerCase().includes(term) ||
-  //       item.validUntil.toLowerCase().includes(term) ||
-  //       item.amount.toLowerCase().includes(term);
-
-  //     return matchesFilter && matchesSearch;
-  //   });
-  // }, [quotations, searchQuery, statusFilter]);
   const filteredQuotations = quotations.filter((item) => {
     const matchesSearch =
       item.quotationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.customerName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'All' || item.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesDate = isWithinFilter(item.quotationDate || item.createdAt, yearFilter);
+
+    return matchesSearch && matchesStatus && matchesDate;
   });
   // const handleDelete = (id) => {
   //   setQuotations((prev) => prev.filter((q) => q.id !== id));
   // };
-  const handleDelete = (id, qNum) => {
-    if (window.confirm(`Are you sure you want to delete quotation ${qNum}?`)) {
-      deleteQuotation(id);
+  const handleDelete = async (id, qNum) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete quotation "${qNum}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    });
+    if (result.isConfirmed) {
+      try {
+        await deleteQuotation(id);
+        // Optional: Show success toast/alert after successful deletion
+        Swal.fire({
+          title: 'Deleted!',
+          text: `Quotation "${qNum}" has been deleted.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        console.error('Failed to delete quotation:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete quotation. Please try again.',
+          icon: 'error',
+        });
+      }
     }
   };
+  const handleSearch= async ()=> {
+    setIsLoading(true);
+    try {
+      await fetchQuotationsByDate(initialDate,finalDate);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   return (
     <>
       <div className='title-header'>
@@ -165,25 +120,29 @@ function QuotationsView() {
           <h2>Quotations</h2>
           <p>Manage and issue customer quotations.</p>
         </div>
-        <button onClick={() => {
-          setEditingQuotation(null);
-          setIsCreateQuotationOpen(true);
-        }}>Create Quotation</button>
+        <div className='year-container'>
+            <select
+              className="select-filter year-select"
+              value={yearFilter}
+              onChange={(e) => setYearFilter(e.target.value)}
+            >
+              {yearOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                      {opt}
+                  </option>
+              ))}
+            </select>
+            <button onClick={() => {
+              setEditingQuotation(null);
+              setIsCreateQuotationOpen(true);
+            }}>Create Quotation</button>
+        </div>
+        
       </div>
 
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-          {/* {statsData.map((stat, index) => (
-            <StatCard
-              key={index}
-              title={stat.title}
-              value={stat.value}
-              subtitle={stat.subtitle}
-              icon={stat.icon}
-              colorScheme={stat.colorScheme}
-              valueColor={stat.valueColor}
-            />
-          ))} */}
+        
           <StatCard
             // key={index}
             title="Total Quotations"
@@ -191,7 +150,7 @@ function QuotationsView() {
             subtitle="Issued proposals"
             icon={<FileText />}
             colorScheme="purple"
-          // valueColor={stat.valueColor}
+      
           />
           <StatCard
             // key={index}
@@ -200,7 +159,7 @@ function QuotationsView() {
             subtitle="Ready for invoicing"
             icon={<CheckCircle2 />}
             colorScheme="green"
-          // valueColor={stat.valueColor}
+    
           />
           <StatCard
             // key={index}
@@ -218,9 +177,36 @@ function QuotationsView() {
             subtitle="Gross quoted amounts"
             icon={<Trophy />}
             colorScheme="blue"
-          // valueColor={stat.valueColor}
+       
           />
         </div>
+      </div>
+      <div className='projects-controls2'>
+        <div className='projects-controls2-left'>
+          <input
+            type="date"
+            required
+            value={initialDate}
+            onChange={(e) => setInitialDate(e.target.value)}
+            className="projects-controls2-input"
+          />
+          <input
+            type="date"
+            required
+            value={finalDate}
+            onChange={(e) => setFinalDate(e.target.value)}
+            className="projects-controls2-input"
+          />
+        </div>
+        <button 
+          type='button'
+          className='search-button-right' 
+          onClick={handleSearch}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Searching..' : 'Search'}
+          {isLoading && <LoadingIndicator />}
+        </button>
       </div>
       <div className='quotations-wrapper'>
         {/* Header with Title & Filter Controls */}
@@ -350,7 +336,7 @@ function QuotationsView() {
                             title="Delete"
                             onClick={() => handleDelete(item.id, item.quotationNumber)}
                           >
-                            <DeleteIcon />
+                            <TrashIcon />
                           </button>
                         </div>
                       </td>

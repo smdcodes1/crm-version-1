@@ -365,6 +365,40 @@
     color: #94a3b8;
     font-size: 14px;
 }
+/* Dropdowns */
+
+.year-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 11px;
+}
+
+.select-filter {
+    height: 38px;
+    padding: 0 32px 0 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #1e293b;
+    background-color: #ffffff;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    transition: all 0.2s ease;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.year-select {
+    border: 1.5px solid #e2e8f0;
+    min-width: 140px;
+}
+
+.select-filter:focus {
+    border-color: #9333ea;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
 
 /* Responsive Breakpoints */
 @media (max-width: 1024px) {
@@ -408,4 +442,21 @@
     .cards-grid {
     grid-template-columns: 1fr;
     }
+
+    .year-container {
+        flex-wrap: nowrap;
+        gap: 6px;
+    }
 }
+
+@media (max-width: 480px) {
+    .year-container {
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+
+    .year-select {
+        min-width: 90px !important;
+    }
+}
+

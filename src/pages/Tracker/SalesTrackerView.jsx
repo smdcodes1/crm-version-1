@@ -1,156 +1,81 @@
 import React, { useState, useMemo } from 'react';
 import StatCard from '../../components/StatCard/StatCard';
-
+import Swal from 'sweetalert2';
 import { TrendingUp, UserCheck, Trophy, XCircle, Plus, Search, Calendar, Bell, Edit2, Trash2, FileText, Clock, CheckCircle2, Filter } from "lucide-react";
 import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
 import "./SalesTrackerView.css";
 import { useCRM } from '../../context/CRMContext';
 import { formatDate, formatINR, getRelativeDay } from '../../utils/Formatters';
 import SaleFormModal from '../../components/forms/SaleFormModal/SaleFormModal';
-const SearchIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
-const EditIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-  </svg>
-);
-const DeleteIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6"></polyline>
-    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-  </svg>
-);
+import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
+import { SearchIcon,EditIcon,TrashIcon } from '../../components/StatCard/StatCard';
 
-// const statsData = [
-//       {
-//       title: 'TOTAL SALES',
-//       value: '5',
-//       subtitle: 'Oppurtunities logged',
-//       icon: <TrendingUpIcon />,
-//       colorScheme: 'purple',
-//       },
-//       {
-//       title: 'FOLLOWING',
-//       value: '2',
-//       subtitle: 'Active pipeline deals ',
-//       icon: <FollowingIcon />,
-//       colorScheme: 'blue',
-//       },
-//       {
-//       title: 'WON',
-//       value: '2',
-//       subtitle: 'Closed successfully',
-//       icon: <CheckCircleIcon />,
-//       colorScheme: 'green',
-//       valueColor: '#7c3aed',
-//       },
-//       {
-//       title: 'LOST',
-//       value: '1',
-//       subtitle: 'Declined / postponed',
-//       icon: <LostSalesIcon />,
-//       colorScheme: 'red',
-//       },
-//       {
-//       title: 'TOTAL PROPOSAL VALUE',
-//       value: '₹4,85,000',
-//       subtitle: 'Cumulative pipeline',
-//       icon: <TrophyIcon />,
-//       colorScheme: 'blue',
-//       },
-// ];
-// const INITIAL_SALES = [
-//   {
-//     id: 1,
-//     company: 'ABC\nTechnologies',
-//     contact: '+91 98765\n43210',
-//     service: 'Website & Portal Development',
-//     serviceDescription: 'Customer requested minor revision in milestone payments.',
-//     industry: 'IT & Software',
-//     hasProposal: true,
-//     value: '₹80,000',
-//     status: 'Following',
-//     date: '15 Aug 2026'
-//   },
-//   {
-//     id: 2,
-//     company: 'XYZ Ltd',
-//     contact: '+91 87654\n32109',
-//     service: 'SEO & Growth Marketing',
-//     serviceDescription: 'Deal closed with 1-year upfront commitment.',
-//     industry: 'Retail & E-commerce',
-//     hasProposal: true,
-//     value: '₹40,000',
-//     status: 'Won',
-//     date: '14 Aug 2026'
-//   },
-//   {
-//     id: 3,
-//     company: 'HealthCare\n360',
-//     contact: '+91 99887\n76655',
-//     service: 'Patient Portal Application',
-//     serviceDescription: 'Final negotiation round with the management committee.',
-//     industry: 'Healthcare',
-//     hasProposal: true,
-//     value: '₹1,50,000',
-//     status: 'Negotiation',
-//     date: '12 Aug 2026'
-//   },
-//   {
-//     id: 4,
-//     company: 'Demo Corp',
-//     contact: '+91 76543\n21098',
-//     service: 'ERP Integration Module',
-//     serviceDescription: 'Budget frozen until next financial quarter.',
-//     industry: 'Manufacturing',
-//     hasProposal: true,
-//     value: '₹95,000',
-//     status: 'Lost',
-//     date: '5 Aug 2026'
-//   },
-//   {
-//     id: 5,
-//     company: 'Apex Logistics',
-//     contact: '+91 98112\n23344',
-//     service: 'Fleet Tracker Dashboard',
-//     serviceDescription: 'Approved by Managing Director. 50% advance received.',
-//     industry: 'Logistics &\nSupply',
-//     hasProposal: true,
-//     value: '₹1,20,000',
-//     status: 'Won',
-//     date: '1 Aug 2026'
-//   }
-// ];
+// const BellIcon= ()=> (
+//   <svg
+//     xmlns="http://www.w3.org/2000/svg"
+//     width='24'
+//     height='24'
+//     viewBox="0 0 24 24"
+//     fill="none"
+//     stroke='currentColor'
+//     strokeWidth='2'
+//     strokeLinecap="round"
+//     strokeLinejoin="round"
+
+//   >
+//     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+//     <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+//   </svg>
+// );
+const yearOptions= ['Monthly', 'Quarterly', 'Halfly', 'Yearly'];
 function SalesTrackerView() {
+  const [isLoading, setIsLoading]= useState(false);
   // const [sales, setSales]= useState(INITIAL_SALES);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [industryFilter, setIndustryFilter] = useState('All Industries');
   const [editingSale, setEditingSale] = useState(null);
-  const { isAddSaleOpen, setIsAddSaleOpen, deleteSale, sales, deleteFollowUp } = useCRM();
+  const [yearFilter, setYearFilter]= useState('Monthly');
+  const [initialDate, setInitialDate]= useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate, setFinalDate]= useState(() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30);
+      return d.toISOString().split('T')[0];
+  });
+  const { isAddSaleOpen, setIsAddSaleOpen, deleteSale, sales, deleteFollowUp, fetchSalesByDate } = useCRM();
   const statusOptions = ['All Statuses', 'Following', 'Negotiation', 'Won', 'Lost'];
-  // Unique industries
-  // const industryOptions = [
-  //   'All Industries',
-  //   'IT & Software',
-  //   'Retail & E-commerce',
-  //   'Healthcare',
-  //   'Manufacturing',
-  //   'Logistics & Supply'
-  // ];
-  const industries = Array.from(new Set(sales.map((s) => s.industry).filter(Boolean)));
+  const isWithinFilter = (dateString, filter) => {
+    if (!dateString) return false;
+    const itemDate = new Date(dateString);
+    if (isNaN(itemDate.getTime())) return false;
+
+    const now = new Date();
+    const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
+
+    switch (filter) {
+        case 'Monthly':
+            return daysDifference <= 30;
+        case 'Quarterly':
+            return daysDifference <= 90;
+        case 'Halfly':
+            return daysDifference <= 180;
+        case 'Annually':
+            return daysDifference <= 365;
+        default:
+            return true;
+    }
+  };
+
+  const industries = ['All Industries', ...Array.from(new Set(sales.map((s) => s.industry).filter(Boolean)))];
+  const filteredSalesHeader = sales.filter(s => isWithinFilter(s.createdAt || s.saleDate, yearFilter));
   // Metrics
-  const totalSalesCount = sales.length;
-  const followingCount = sales.filter(
+  const totalSalesCount = filteredSalesHeader.length;
+  const followingCount = filteredSalesHeader.filter(
     (s) => s.status === 'Following' || s.status === 'Proposal Sent' || s.status === 'Negotiation'
   ).length;
-  const wonCount = sales.filter((s) => s.status === 'Won').length;
-  const lostCount = sales.filter((s) => s.status === 'Lost').length;
-  const totalProposalValue = sales.reduce((sum, s) => sum + (s.proposalValue || 0), 0);
+  const wonCount = filteredSalesHeader.filter((s) => s.status === 'Won').length;
+  const lostCount = filteredSalesHeader.filter((s) => s.status === 'Lost').length;
+  const totalProposalValue = filteredSalesHeader.reduce((sum, s) => sum + (s.proposalValue || 0), 0);
   // Filter list 
   const filteredSales = useMemo(() => {
     return sales.filter((item) => {
@@ -171,8 +96,9 @@ function SalesTrackerView() {
         (item.industry || '').toLowerCase().includes(term) ||
         String(item.proposalValue || '').toLowerCase().includes(term) ||
         String(item.reminder?.date || '').toLowerCase().includes(term);
+        const matchesDate = isWithinFilter(item.createdAt, yearFilter);
 
-      return matchesStatus && matchesIndustry && matchesSearch;
+      return matchesStatus && matchesIndustry && matchesSearch && matchesDate;
     });
   }, [sales, searchQuery, statusFilter, industryFilter]);
   // const filteredSales = sales.filter((s) => {
@@ -190,14 +116,61 @@ function SalesTrackerView() {
   // const handleDelete = (id) => {
   //   setSales((prev) => prev.filter((s) => s.id !== id));
   // };
-  const handleDelete = (id, name) => {
-    if (window.confirm(`Are you sure you want to delete the sale for "${name}"?`)) {
-      deleteSale(id);
+  const handleDelete = async (id, name) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete sale "${name}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    });
+    if (result.isConfirmed) {
+      try {
+        await deleteSale(id);
+        // Optional: Show success toast/alert after successful deletion
+        Swal.fire({
+          title: 'Deleted!',
+          text: `Sale "${name}" has been deleted.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        console.error('Failed to delete sale:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete sale. Please try again.',
+          icon: 'error',
+        });
+      }
     }
   };
-  const handleUpdateFollowUp = (id, name) => {
-    if (window.confirm(`Are you sure you want to delete the sale for "${name}"?`)) {
-      deleteFollowUp(id);
+  const handleUpdateFollowUp = async (id, name) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete the follow-up for "${name}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    });
+    if (result.isConfirmed) {
+      await deleteFollowUp(id);
+    }
+  }; 
+  const handleSearch= async ()=> {
+    setIsLoading(true);
+    try {
+      await fetchSalesByDate(initialDate,finalDate);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -207,25 +180,29 @@ function SalesTrackerView() {
           <h2>Sales Tracker</h2>
           <p>Track your sales oppurtunities and follow-ups!</p>
         </div>
-        <button onClick={() => {
-          setEditingSale(null);
-          setIsAddSaleOpen(true);
-        }}>Add Sale</button>
+        <div className='year-container'>
+          <select
+            className="select-filter year-select"
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+          >
+            {yearOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                    {opt}
+                </option>
+            ))}
+          </select>
+          <button onClick={() => {
+            setEditingSale(null);
+            setIsAddSaleOpen(true);
+          }}>Add Sale</button>
+        </div>
+       
       </div>
 
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-          {/* {statsData.map((stat, index) => (
-            <StatCard
-              key={index}
-              title={stat.title}
-              value={stat.value}
-              subtitle={stat.subtitle}
-              icon={stat.icon}
-              colorScheme={stat.colorScheme}
-              valueColor={stat.valueColor}
-            />
-          ))} */}
+         
           <StatCard
             // key={index}
             title="Total Sales"
@@ -233,7 +210,7 @@ function SalesTrackerView() {
             subtitle="Oppurtunities logged"
             icon={<TrendingUp />}
             colorScheme="purple"
-          // valueColor={stat.valueColor}
+     
           />
           <StatCard
             // key={index}
@@ -242,7 +219,7 @@ function SalesTrackerView() {
             subtitle="Active pipeline deals"
             icon={<UserCheck />}
             colorScheme="blue"
-          // valueColor={stat.valueColor}
+       
           />
           <StatCard
             // key={index}
@@ -272,6 +249,34 @@ function SalesTrackerView() {
           // valueColor="#7c3aed"
           />
         </div>
+      </div>
+      <div className='projects-controls4'>
+        <div className='projects-controls4-left'>
+          <input
+              type="date"
+              required
+              value={initialDate}
+              onChange={(e) => setInitialDate(e.target.value)}
+              className="projects-controls4-input"
+          />
+          <input
+              type="date"
+              required
+              value={finalDate}
+              onChange={(e) => setFinalDate(e.target.value)}
+              className="projects-controls4-input"
+          />
+          
+        </div>
+        <button 
+          type='button'
+          disabled={isLoading}
+          className='search-button-right' 
+          onClick={handleSearch}
+        >
+          {isLoading ? 'Searching..' : "Search"}
+          {isLoading && <LoadingIndicator />}
+        </button>
       </div>
       <div className='pipeline-wrapper'>
         {/* Header Bar */}
@@ -356,21 +361,7 @@ function SalesTrackerView() {
                           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', color: '#7c3aed', fontWeight: 600, fontSize: '11px', gap: '0px', marginTop: '0.5px', cursor: 'pointer', border: 'none', background: 'none' }}
                           onClick={() => handleUpdateFollowUp(item.id, item.customerName)}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width='24'
-                            height='24'
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke='currentColor'
-                            strokeWidth='2'
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-
-                          >
-                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                          </svg>
+                          <Bell color='#7c3aed' />
                           <span>{getRelativeDay(item.reminder.date)} ({item.reminder.time})</span>
                         </button>
                       ) : <div />}
@@ -433,7 +424,7 @@ function SalesTrackerView() {
                           title="Delete"
                           onClick={() => handleDelete(item.id, item.customerName)}
                         >
-                          <DeleteIcon />
+                          <TrashIcon />
                         </button>
                       </div>
                     </td>

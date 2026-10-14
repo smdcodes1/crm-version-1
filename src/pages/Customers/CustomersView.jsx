@@ -1,130 +1,64 @@
 import React, { useState, useMemo } from 'react';
 import "./CustomersView.css";
-
+import Swal from 'sweetalert2';
 import {Users,UserCheck,Trophy,XCircle,Plus,Search,Eye,Edit2,Trash2,Phone,Mail,Building,Filter} from "lucide-react";
-import StatCard from '../../components/StatCard/StatCard';
+import StatCard, { EditIcon, SearchIcon, TrashIcon, ViewIcon } from '../../components/StatCard/StatCard';
 import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
 import { useCRM } from '../../context/CRMContext';
 import CustomerDetailModal from '../../components/modals/CustomerDetailModal/CustomerDetailModal';
 import CustomerFormModal from "../../components/forms/CustomerFormModal/CustomerFormModal";
-// const statsData = [
-//   {
-//     title: 'TOTAL CUSTOMERS',
-//     value: '5',
-//     subtitle: 'Directory Accounts',
-//     icon: <CustomersIcon />,
-//     colorScheme: 'purple',
-//   },
-//   {
-//     title: 'FOLLOWING',
-//     value: '2',
-//     subtitle: 'Ongoing Dialogues',
-//     icon: <FollowingIcon />,
-//     colorScheme: 'blue',
-//   },
-//   {
-//     title: 'WON',
-//     value: '2',
-//     subtitle: 'Converted clients',
-//     icon: <TrophyIcon />,
-//     colorScheme: 'green',
-//     valueColor: '#7c3aed',
-//   },
-//   {
-//     title: 'LOST',
-//     value: '1',
-//     subtitle: 'Past interactions',
-//     icon: <LostSalesIcon />,
-//     colorScheme: 'red',
-//   },
-// ];
-// const INITIAL_CUSTOMERS = [
-//   {
-//     id: 1,
-//     initial: 'A',
-//     companyName: 'ABC Technologies',
-//     location: 'Bengaluru',
-//     contactName: 'John Doe',
-//     email: 'john@abctech.example.com',
-//     phone: '+91 98765 43210',
-//     industry: 'IT & Software',
-//     status: 'Following'
-//   },
-//   {
-//     id: 2,
-//     initial: 'X',
-//     companyName: 'XYZ Ltd',
-//     location: 'Mumbai',
-//     contactName: 'Sarah Jenkins',
-//     email: 'sarah@xyzretail.example.com',
-//     phone: '+91 87654 32109',
-//     industry: 'Retail & E-commerce',
-//     status: 'Won'
-//   },
-//   {
-//     id: 3,
-//     initial: 'D',
-//     companyName: 'Demo Corp',
-//     location: 'Pune',
-//     contactName: 'David Miller',
-//     email: 'david@democorp.example.com',
-//     phone: '+91 76543 21098',
-//     industry: 'Manufacturing',
-//     status: 'Lost'
-//   },
-//   {
-//     id: 4,
-//     initial: 'H',
-//     companyName: 'HealthCare 360',
-//     location: 'Hyderabad',
-//     contactName: 'Dr. Anita Rao',
-//     email: 'anita@hc360.example.com',
-//     phone: '+91 99887 76655',
-//     industry: 'Healthcare',
-//     status: 'Following'
-//   },
-//   {
-//     id: 5,
-//     initial: 'A',
-//     companyName: 'Apex Logistics',
-//     location: 'New Delhi',
-//     contactName: 'Rahul Sharma',
-//     email: 'rahul@apexlog.example.com',
-//     phone: '+91 98112 23344',
-//     industry: 'Logistics & Supply',
-//     status: 'Won'
-//   }
-// ];
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+const PhoneIcon= ()=> (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+  </svg>
+);
+const yearOptions= ['Monthly', 'Quarterly', 'Halfly', 'Annually'];
 function CustomersView() {
+  const [isLoading, setIsLoading]= useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   // const [customers, setCustomers] = useState(INITIAL_CUSTOMERS);
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
   const [viewingCustomer, setViewingCustomer] = useState(null);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const filterTabs = ['All', 'Following', 'Won', 'Lost'];
-  const { customers, deleteCustomer, isAddCustomerOpen, setIsAddCustomerOpen } = useCRM();
-  // summary counts
-  const totalCount = customers.length;
-  const followingCount = customers.filter((c) => c.status === 'Following').length;
-  const wonCount = customers.filter((c) => c.status === 'Won').length;
-  const lostCount = customers.filter((c) => c.status === 'Lost').length;
-  // filter list 
-  // const filteredCustomers = useMemo(() => {
-  //   return customers.filter((cust) => {
-  //     const matchesFilter = selectedStatusFilter === 'All' || cust.status === selectedStatusFilter;
-  //     const term = searchQuery.toLowerCase().trim();
-  //     const matchesSearch =
-  //       term === '' ||
-  //       cust.companyName.toLowerCase().includes(term) ||
-  //       cust.contactName.toLowerCase().includes(term) ||
-  //       cust.email.toLowerCase().includes(term) ||
-  //       cust.phone.includes(term) ||
-  //       cust.industry.toLowerCase().includes(term) ||
-  //       cust.location.toLowerCase().includes(term);
+  const { customers, deleteCustomer, isAddCustomerOpen, setIsAddCustomerOpen, fetchCustomersByDate } = useCRM();
+  const [yearFilter, setYearFilter]= useState('Monthly');
+  const [initialDate, setInitialDate]= useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate, setFinalDate]= useState(() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30);
+      return d.toISOString().split('T')[0];
+  });
+  const isWithinFilter = (dateString, filter) => {
+    if (!dateString) return false;
+    const itemDate = new Date(dateString);
+    if (isNaN(itemDate.getTime())) return false;
 
-  //     return matchesFilter && matchesSearch;
-  //   });
-  // }, [customers, searchQuery, selectedStatusFilter]);
+    const now = new Date();
+    const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
+
+    switch (filter) {
+        case 'Monthly':
+            return daysDifference <= 30;
+        case 'Quarterly':
+            return daysDifference <= 90;
+        case 'Halfly':
+            return daysDifference <= 180;
+        case 'Annually':
+            return daysDifference <= 365;
+        default:
+            return true;
+    }
+  };
+  const filteredCustomersHeader = customers.filter(c => isWithinFilter(c.createdAt, yearFilter));
+  // summary counts
+  const totalCount = filteredCustomersHeader.length;
+  const followingCount = filteredCustomersHeader.filter((c) => c.status === 'Following').length;
+  const wonCount = filteredCustomersHeader.filter((c) => c.status === 'Won').length;
+  const lostCount = filteredCustomersHeader.filter((c) => c.status === 'Lost').length;
+  // filter list 
+ 
   const filteredCustomers = customers.filter((cust) => {
     const matchesSearch =
       cust.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -133,18 +67,53 @@ function CustomersView() {
       cust.industry.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (cust.city && cust.city.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesStatus =
-      selectedStatusFilter === 'All' || cust.status === selectedStatusFilter;
+    const matchesStatus = selectedStatusFilter === 'All' || cust.status === selectedStatusFilter;
+    const matchesDate = isWithinFilter(cust.createdAt, yearFilter);
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
-  const handleDelete = (id, name) => {
-    if (window.confirm(`Are you sure you want to delete customer "${name}"?`)) {
-      deleteCustomer(id);
+  const handleDelete = async (id, name) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete customer "${name}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    });
+    if (result.isConfirmed) {
+      try {
+        await deleteCustomer(id);
+        // Optional: Show success toast/alert after successful deletion
+        Swal.fire({
+          title: 'Deleted!',
+          text: `Customer "${name}" has been deleted.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        console.error('Failed to delete customer:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete customer. Please try again.',
+          icon: 'error',
+        });
+      }
     }
   };
-
+  const handleSearch= async ()=> {
+    setIsLoading(true);
+  try {
+    await fetchCustomersByDate(initialDate,finalDate);
+  } finally {
+    setIsLoading(false);
+  }
+  };
   return (
     <>
       <div className='title-header'>
@@ -152,24 +121,29 @@ function CustomersView() {
           <h2>Customers</h2>
           <p>Manage your customer relationships.</p>
         </div>
-        <button onClick={()=> {
-          setEditingCustomer(null);
-          setIsAddCustomerOpen(true);
-        }}>Add Customer</button>
+         <div className='year-container'>
+            <select
+                className="select-filter year-select"
+                value={yearFilter}
+                onChange={(e) => setYearFilter(e.target.value)}
+            >
+                {yearOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                        {opt}
+                    </option>
+                ))}
+            </select>
+            <button onClick={()=> {
+              setEditingCustomer(null);
+              setIsAddCustomerOpen(true);
+            }}>Add Customer</button>
+
+          </div>
+        
       </div>
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-          {/* {statsData.map((stat, index) => (
-            <StatCard
-              key={index}
-              title={stat.title}
-              value={stat.value}
-              subtitle={stat.subtitle}
-              icon={stat.icon}
-              colorScheme={stat.colorScheme}
-              valueColor={stat.valueColor}
-            />
-          ))} */}
+        
           <StatCard
             // key={index}
             title="Total Customers"
@@ -177,7 +151,7 @@ function CustomersView() {
             subtitle="Directory accounts"
             icon={<Users />}
             colorScheme="purple"
-          // valueColor={stat.valueColor}
+       
           />
           <StatCard
             // key={index}
@@ -186,7 +160,7 @@ function CustomersView() {
             subtitle="Ongoing dialogues"
             icon={<UserCheck />}
             colorScheme="blue"
-          // valueColor={stat.valueColor}
+        
           />
           <StatCard
             // key={index}
@@ -208,6 +182,34 @@ function CustomersView() {
           />
         </div>
       </div>
+      <div className='projects-controls1'>
+        <div className='projects-controls1-left'>
+          <input
+              type="date"
+              required
+              value={initialDate}
+              onChange={(e) => setInitialDate(e.target.value)}
+              className="projects-controls1-input"
+          />
+          <input
+              type="date"
+              required
+              value={finalDate}
+              onChange={(e) => setFinalDate(e.target.value)}
+              className="projects-controls1-input"
+          />
+        </div>
+        <button 
+          type='button'
+          className='search-button-right' 
+          onClick={handleSearch}
+          disabled={isLoading}
+        >
+          
+          {isLoading ? 'Searching..' : 'Search'}
+          {isLoading && <LoadingIndicator />}
+        </button>
+      </div>
       <div className='customers-wrapper'>
         {/* Header controls: Search & Filter Tabs */}
         <div className="customers-header">
@@ -219,10 +221,7 @@ function CustomersView() {
           <div className="actions-group">
             <div className="search-box">
               <span className="search-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
+                <SearchIcon />
    
               </span>
               <input
@@ -295,9 +294,7 @@ function CustomersView() {
                     <td>
                       <div className="phone-cell">
                         <span className="phone-icon">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                          </svg>
+                         <PhoneIcon />
                             {/* <Phone/> */}
                         </span>
                         <span>{cust.phone}</span>
@@ -318,19 +315,14 @@ function CustomersView() {
                     <td>
                       <div className="actions-cell">
                         <button type="button" className="action-view" title="View details" onClick={() => setViewingCustomer(cust)}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                          </svg>
+                          <ViewIcon />
                     
                           <span>View</span>
                         </button>
                         <button type="button" className="action-icon-btn1" title="Edit" onClick={() => { 
                           setEditingCustomer(cust); 
                           setIsAddCustomerOpen(true); }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                          </svg>
+                         <EditIcon />
                    
                         </button>
                         <button
@@ -339,10 +331,7 @@ function CustomersView() {
                           title="Delete"
                           onClick={() => handleDelete(cust.id, cust.companyName)}
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
+                          <TrashIcon />
                   
                         </button>
                       </div>

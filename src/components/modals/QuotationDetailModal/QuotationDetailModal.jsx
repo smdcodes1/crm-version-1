@@ -4,7 +4,54 @@ import { formatDate,formatINR } from '../../../utils/Formatters';
 import { StatusBadge } from '../../StatusBadge/StatusBadge';
 import { Modal } from '../../Modal/Modal';
 import "./QuotationDetailModal.css";
-
+const PrintIcon = ()=> (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="6 9 6 2 18 2 18 9" />
+    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+    <rect width="12" height="8" x="6" y="14" />
+  </svg>
+);
+const CheckCircleIcon = ()=> (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+);
+const InvoiceIcon = ()=> (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+    <path d="M16 8h-8" />
+    <path d="M16 12h-8" />
+    <path d="M13 16h-5" />
+  </svg>
+);
 function QuotationDetailModal({isOpen,onClose,quotation,onGenerateInvoice = () => {}}) {
     const {updateQuotation,invoices}= useCRM();
     const [status, setStatus]= useState(quotation?.status);
@@ -54,38 +101,13 @@ function QuotationDetailModal({isOpen,onClose,quotation,onGenerateInvoice = () =
                 onClick={handlePrint}
                 className="qdm-btn-outline"
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="6 9 6 2 18 2 18 9" />
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                  <rect width="12" height="8" x="6" y="14" />
-                </svg>
+                <PrintIcon />
                 Print / Save PDF
               </button>
 
               {existingInvoice ? (
                 <span className="qdm-invoiced-pill">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                    <path d="m9 12 2 2 4-4" />
-                  </svg>
+                 <CheckCircleIcon />
                   Invoiced ({existingInvoice.invoiceNumber})
                 </span>
               ) : (
@@ -98,21 +120,7 @@ function QuotationDetailModal({isOpen,onClose,quotation,onGenerateInvoice = () =
                   }}
                   className="qdm-btn-primary"
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
-                    <path d="M16 8h-8" />
-                    <path d="M16 12h-8" />
-                    <path d="M13 16h-5" />
-                  </svg>
+                  <InvoiceIcon />
                   Generate Invoice
                 </button>
               )}

@@ -1,142 +1,116 @@
 import React, { useState, useMemo } from 'react';
 import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
-
-import {Receipt,Plus,Search,Eye,Trash2,CheckCircle2,AlertCircle,FileText,DollarSign,Clock} from "lucide-react";
+import Swal from 'sweetalert2';
+import { Receipt, Plus, Search, Eye, Trash2, CheckCircle2, AlertCircle, FileText, DollarSign, Clock } from "lucide-react";
 import StatCard from '../../components/StatCard/StatCard';
 import "./InvoicesView.css";
 import { useCRM } from '../../context/CRMContext';
 import { formatDate, formatINR } from '../../utils/Formatters';
 import InvoiceDetailModal from '../../components/modals/InvoiceDetailModal/InvoiceDetailModal';
 import GenerateInvoiceModal from '../../components/forms/GenerateInvoiceModal/GenerateInvoiceModal';
-const SearchIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
+import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
+import { SearchIcon,ViewIcon,TrashIcon } from '../../components/StatCard/StatCard';
 const CheckCircleIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="9" />
     <polyline points="8.5 12.5 11 15 15.5 9.5" />
   </svg>
 );
-const ViewIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-);
-const DeleteIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6"></polyline>
-    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-  </svg>
-);
-// const INITIAL_INVOICES = [
-//   {
-//     id: 1,
-//     invoiceNo: 'INV-0001',
-//     quotationRef: 'QT-0001',
-//     company: 'ABC Technologies',
-//     date: '15 Aug 2026',
-//     dueDate: '30 Aug 2026',
-//     amount: '₹94,400',
-//     paidAmount: null,
-//     status: 'Paid'
-//   },
-//   {
-//     id: 2,
-//     invoiceNo: 'INV-0002',
-//     quotationRef: 'QT-0002',
-//     company: 'XYZ Ltd',
-//     date: '14 Aug 2026',
-//     dueDate: '28 Aug 2026',
-//     amount: '₹53,100',
-//     paidAmount: '₹25,000',
-//     status: 'Partially Paid'
-//   }
-// ];
-// const statsData = [
-//   {
-//     title: 'TOTAL INVOICES',
-//     value: '2',
-//     subtitle: 'Tax invoices issued',
-//     icon: <ReceiptDollarIcon />,
-//     colorScheme: 'purple',
-//   },
-//   {
-//     title: 'TOTAL INVOICED',
-//     value: '₹1,47,500',
-//     subtitle: 'Gross billed amount',
-//     icon: <DocumentIcon />,
-//     colorScheme: 'blue',
-//   },
-//   {
-//     title: 'COLLECTED REVENUE',
-//     value: '₹1,19,400',
-//     subtitle: '1 fully settled',
-//     icon: <CheckCircleIcon />,
-//     colorScheme: 'green',
-//     valueColor: '#7c3aed',
-//   },
-//   {
-//     title: 'UNPAID / DUE',
-//     value: '0',
-//     subtitle: 'Pending Settlements',
-//     icon: <ClockIcon />,
-//     colorScheme: 'red',
-//   },
-// ];
+const yearOptions = ['Monthly', 'Quarterly', 'Halfly', 'Annually'];
 function InvoicesView() {
+  const [isLoading, setIsLoading]= useState(false);
   // const [invoices, setInvoices] = useState(INITIAL_INVOICES);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [viewingInvoice, setViewingInvoice] = useState(null);
-  const { isGenerateInvoiceOpen, setIsGenerateInvoiceOpen, invoices, updateInvoice, deleteInvoice } = useCRM();
-  const filterTabs = ['All', 'Unpaid', 'Partly Paid', 'Paid', 'Overdue'];
+  const [yearFilter, setYearFilter] = useState('Monthly');
+  const [initialDate, setInitialDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate, setFinalDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
+  });
+  const { isGenerateInvoiceOpen, setIsGenerateInvoiceOpen, invoices, updateInvoice, deleteInvoice, fetchInvoicesByDate } = useCRM();
+  const filterTabs = ['All', 'Unpaid', 'Partially Paid', 'Paid', 'Overdue'];
+  const isWithinFilter = (dateString, filter) => {
+    if (!dateString) return false;
+    const itemDate = new Date(dateString);
+    if (isNaN(itemDate.getTime())) return false;
+
+    const now = new Date();
+    const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
+
+    switch (filter) {
+      case 'Monthly':
+        return daysDifference <= 30;
+      case 'Quarterly':
+        return daysDifference <= 90;
+      case 'Halfly':
+        return daysDifference <= 180;
+      case 'Annually':
+        return daysDifference <= 365;
+      default:
+        return true;
+    }
+  };
+  const filteredInvoicesHeader = invoices.filter(i => isWithinFilter(i.invoiceDate || i.createdAt, yearFilter));
   // Summary Metrics 
-  const totalCount = invoices.length;
-  const totalBilled = invoices.reduce((sum, i) => sum + (i.total || 0), 0);
-  const paidInvoices = invoices.filter((i) => i.paymentStatus === 'Paid');
-  const totalCollected = invoices.reduce((sum, i) => {
+  const totalCount = filteredInvoicesHeader.length;
+  const totalBilled = filteredInvoicesHeader.reduce((sum, i) => sum + (i.total || 0), 0);
+  const paidInvoices = filteredInvoicesHeader.filter((i) => i.paymentStatus === 'Paid');
+  const totalCollected = filteredInvoicesHeader.reduce((sum, i) => {
     if (i.paymentStatus === 'Paid') return sum + i.total;
-    if (i.paymentStatus === 'Partly Paid') return sum + (i.paidAmount || 0);
+    if (i.paymentStatus === 'Partially Paid') return sum + (i.paidAmount || 0);
     return sum;
   }, 0);
-  const unpaidCount = invoices.filter(
+  const unpaidCount = filteredInvoicesHeader.filter(
     (i) => i.paymentStatus === 'Unpaid' || i.paymentStatus === 'Overdue'
   ).length;
 
-  // const filteredInvoices = useMemo(() => {
-  //   return invoices.filter((item) => {
-  //     const matchesFilter = statusFilter === 'All' || item.status === statusFilter;
-  //     const term = searchQuery.toLowerCase().trim();
-  //     const matchesSearch =
-  //       term === '' ||
-  //       item.invoiceNo.toLowerCase().includes(term) ||
-  //       item.quotationRef.toLowerCase().includes(term) ||
-  //       item.company.toLowerCase().includes(term) ||
-  //       item.date.toLowerCase().includes(term) ||
-  //       item.dueDate.toLowerCase().includes(term) ||
-  //       item.amount.toLowerCase().includes(term);
-
-  //     return matchesFilter && matchesSearch;
-  //   });
-  // }, [invoices, searchQuery, statusFilter]);
   const filteredInvoices = invoices.filter((inv) => {
     const matchesSearch =
       inv.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inv.quotationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inv.customerName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'All' || inv.paymentStatus === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesDate = isWithinFilter(inv.invoiceDate || inv.createdAt, yearFilter);
+    return matchesSearch && matchesStatus && matchesDate;
   });
   // const handleDelete = (id) => {
   //   setInvoices((prev) => prev.filter((inv) => inv.id !== id));
   // };
-  const handleDelete = (id, invNum) => {
-    if (window.confirm(`Are you sure you want to delete invoice ${invNum}?`)) {
-      deleteInvoice(id);
+  const handleDelete = async (id, invNum) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete invoice "${invNum}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    });
+    if (result.isConfirmed) {
+      try {
+
+        await deleteInvoice(id);
+        // Optional: Show success toast/alert after successful deletion
+        Swal.fire({
+          title: 'Deleted!',
+          text: `Invoice "${invNum}" has been deleted.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        console.error('Failed to delete invoice:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete invoice. Please try again.',
+          icon: 'error',
+        });
+      }
     }
   }
   // const handleMarkPaid = (id) => {
@@ -152,6 +126,14 @@ function InvoicesView() {
       paidAmount: inv.total,
     });
   };
+  const handleSearch= async ()=> {
+    setIsLoading(true);
+    try {
+      await fetchInvoicesByDate(initialDate,finalDate);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <>
       <div className='title-header'>
@@ -159,24 +141,29 @@ function InvoicesView() {
           <h2>Invoices</h2>
           <p>Manage billing generated strictly from accepted quotations.</p>
         </div>
-        <button onClick={() => setIsGenerateInvoiceOpen(true)}>
-          Generate Invoice
-        </button>
+        <div className='year-container'>
+          <select
+            className="select-filter year-select"
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+          >
+            {yearOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+          <button onClick={() => setIsGenerateInvoiceOpen(true)}>
+            Generate Invoice
+          </button>
+
+        </div>
+
       </div>
 
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-          {/* {statsData.map((stat, index) => (
-                    <StatCard
-                        key={index}
-                        title={stat.title}
-                        value={stat.value}
-                        subtitle={stat.subtitle}
-                        icon={stat.icon}
-                        colorScheme={stat.colorScheme}
-                        valueColor={stat.valueColor}
-                    />
-                ))} */}
+         
           <StatCard
             // key={index}
             title="Total Invoices"
@@ -184,7 +171,7 @@ function InvoicesView() {
             subtitle="Tax invoices issued"
             icon={<Receipt />}
             colorScheme="purple"
-          // valueColor={stat.valueColor}
+         
           />
           <StatCard
             // key={index}
@@ -193,7 +180,7 @@ function InvoicesView() {
             subtitle="Gross billed amount"
             icon={<FileText />}
             colorScheme="blue"
-          // valueColor={stat.valueColor}
+
           />
           <StatCard
             // key={index}
@@ -215,7 +202,33 @@ function InvoicesView() {
           />
         </div>
       </div>
-
+      <div className='projects-controls3'>
+        <div className='projects-controls3-left'>
+          <input
+            type="date"
+            required
+            value={initialDate}
+            onChange={(e) => setInitialDate(e.target.value)}
+            className="projects-controls3-input"
+          />
+          <input
+            type="date"
+            required
+            value={finalDate}
+            onChange={(e) => setFinalDate(e.target.value)}
+            className="projects-controls3-input"
+          />
+        </div>
+        <button 
+          type='button'
+          className='search-button-right' 
+          onClick={handleSearch}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Searching..' : 'Search'}
+          {isLoading && <LoadingIndicator />}
+        </button>
+      </div>
       <div className='invoices-wrapper'>
         {/* Header with Search and Filter Tabs */}
         <div className="invoices-header">
@@ -271,7 +284,7 @@ function InvoicesView() {
             <tbody>
               {filteredInvoices.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{textAlign:'center',padding:'40px',fontSize:"14px",color:'#94a3b8'}}>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '40px', fontSize: "14px", color: '#94a3b8' }}>
                     No invoices found matching your criteria.
                   </td>
                 </tr>
@@ -280,7 +293,7 @@ function InvoicesView() {
                   <tr key={item.id}>
                     {/* Invoice No */}
                     <td>
-                     
+
                       <button className='invoice-no' onClick={() => setViewingInvoice(item)}>
                         {item.invoiceNumber}
                       </button>
@@ -310,8 +323,8 @@ function InvoicesView() {
                     <td>
                       <div className="amount-cell-wrapper">
                         <span className="amount-val">{formatINR(item.total)}</span>
-                        {item.paymentStatus === 'Partly Paid' && item.paidAmount && (
-                          <span className="amount-subtext">Paid: {formatINR(Math.min(item.paidAmount, item.total / 2))}</span>
+                        {item.paymentStatus === 'Partially Paid' && item.paidAmount && (
+                          <span className="amount-subtext">Paid: {formatINR(item.paidAmount)}</span>
                         )}
                       </div>
                     </td>
@@ -346,7 +359,7 @@ function InvoicesView() {
                           title="Delete"
                           onClick={() => handleDelete(item.id, item.invoiceNumber)}
                         >
-                          <DeleteIcon />
+                          <TrashIcon />
                         </button>
                       </div>
                     </td>
@@ -358,14 +371,14 @@ function InvoicesView() {
         </div>
       </div>
 
-      <InvoiceDetailModal 
+      <InvoiceDetailModal
         isOpen={!!viewingInvoice}
-        onClose={()=> setViewingInvoice(null)}
+        onClose={() => setViewingInvoice(null)}
         invoice={viewingInvoice}
       />
-      <GenerateInvoiceModal 
+      <GenerateInvoiceModal
         isOpen={isGenerateInvoiceOpen}
-        onClose={()=> setIsGenerateInvoiceOpen(false)}
+        onClose={() => setIsGenerateInvoiceOpen(false)}
       />
     </>
   );

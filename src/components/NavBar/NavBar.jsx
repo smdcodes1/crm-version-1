@@ -8,12 +8,41 @@ import { useCRM } from '../../context/CRMContext';
 import { supabase } from '../../supabase/supabaseClient';
 import { getRelativeDay, formatINR } from '../../utils/Formatters';
 
+import Swal from 'sweetalert2';
 const CheckCircleIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="9" />
         <polyline points="8.5 12.5 11 15 15.5 9.5" />
     </svg>
 );
+const SearchIcon= ()=> (
+    <svg
+        className="search-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+);
+// const BellIcon= ()=> (
+//     <svg
+//         className="bell-icon"
+//         viewBox="0 0 24 24"
+//         fill="none"
+//         stroke="currentColor"
+//         strokeWidth="1.75"
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//     >
+//         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+//         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+//     </svg>
+// );
 function NavBar({ onOpenMobileMenu }) {
     const navigate = useNavigate();
     const { activeTab, setActiveTab, notifications, markNotificationRead, clearNotifications, followUps, toggleFollowUpComplete, deleteFollowUp, customers, sales, quotations, invoices, notificationStatus, setNotificationStatus } = useCRM();
@@ -76,13 +105,29 @@ function NavBar({ onOpenMobileMenu }) {
     const totalResultsCount = filteredCustomers.length + filteredSales.length + filteredQuotations.length + filteredInvoices.length;
 
     const handleLogout = async () => {
-        if (user?.id) {
-            localStorage.removeItem(`notifications_enabled_${user.id}`);
-            setNotificationStatus('default');
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to log out of CRM ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Logout!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+        });
+        if (result.isConfirmed) {
+            if (user?.id) {
+                localStorage.removeItem(`notifications_enabled_${user.id}`);
+                setNotificationStatus('default');
+
+                await supabase.auth.signOut();
+                setUser(null);
+                navigate('/login');
+            } else {
+                alert("You are currently logged out.");
+            }
         }
-        await supabase.auth.signOut();
-        setUser(null);
-        navigate('/login');
     };
     return (
         <header className="navbar-container">
@@ -104,18 +149,7 @@ function NavBar({ onOpenMobileMenu }) {
                 {/* Search Bar */}
                 <div className="navbar-center" ref={searchRef}>
                     <div className="search-wrapper">
-                        <svg
-                            className="search-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <circle cx="11" cy="11" r="8" />
-                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
+                       <SearchIcon />
                         <input
                             id='global-search-input'
                             type="text"
@@ -247,18 +281,7 @@ function NavBar({ onOpenMobileMenu }) {
                 <div className="navbar-right"  >
                     <div style={{ position: 'relative' }} ref={notifRef} >
                         <button className="notification-btn" aria-label="Notifications" onClick={() => setIsNotifOpen(!isNotifOpen)}>
-                            <svg
-                                className="bell-icon"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.75"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                            </svg>
+                            <Bell />
                             {unreadNotifCount > 0 && (
                                 <span className="notification-badge"></span>
                             )}
@@ -269,13 +292,13 @@ function NavBar({ onOpenMobileMenu }) {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <h4 style={{ fontWeight: 600, color: '#111827' }}>Reminders & Alerts</h4>
                                         {unreadNotifCount > 0 && (
-                                            <span style={{ fontSize: '0.875rem', backgroundColor: '#ede9fe', color: '#6d28d9', padding: '0.125rem 0.5rem', borderRadius: '50%', fontWeight: 600 }}>
+                                            <span className='unread-notification-count'>
                                                 {unreadNotifCount}
                                             </span>
                                         )}
                                     </div>
                                     {notifications.length > 0 && (
-                                        <button onClick={clearNotifications} style={{ fontSize: '0.75rem', color: '#9ca3af', border: 'none', background: 'none', cursor: 'pointer' }}>
+                                        <button onClick={clearNotifications} className='clear-notifications-count' >
                                             Clear
                                         </button>
                                     )}
@@ -289,13 +312,13 @@ function NavBar({ onOpenMobileMenu }) {
                                             </div>
                                             <div style={{ gap: '0.5rem' }}>
                                                 {pendingFollowups.map((fu) => (
-                                                    <div key={fu.id} style={{ background: '#fff', padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid #ede9fe', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+                                                    <div key={fu.id} className='pending-followup-array'>
                                                         <div>
                                                             <div style={{ fontWeight: 500, color: '#111827', fontSize: '0.875rem' }}>{fu.customerName}</div>
                                                             <p style={{ fontSize: '11px', color: '#4b5563', marginTop: '0.125rem' }}>{fu.note}</p>
                                                             <div style={{ fontSize: '10px', color: '#6d28d9', fontWeight: 600, marginTop: '0.25rem' }}>{getRelativeDay(fu.reminderDate)} at {fu.reminderTime}</div>
                                                         </div>
-                                                        <button title='Mark Completed' style={{ padding: '0.25rem', color: '#9ca3af', borderRadius: '0.25rem', background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => toggleFollowUpComplete(fu.id)}>
+                                                        <button title='Mark Completed' className='mark-completed-btn' onClick={() => toggleFollowUpComplete(fu.id)}>
                                                             <CheckCircleIcon />
                                                         </button>
                                                     </div>

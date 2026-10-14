@@ -4,6 +4,52 @@ import { formatINR,formatDate } from '../../../utils/Formatters';
 import { Modal } from '../../Modal/Modal';
 import { StatusBadge } from '../../StatusBadge/StatusBadge';
 import "./CustomerDetailModal.css";
+const PencilIcon = ()=> (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+    </svg>
+);
+const PhoneIcon = ()=> (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+);
+const EmailIcon = ()=> (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+);
+const BuildingIcon = ()=> (
+    <svg className="cdm-icon-primary" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" />
+    </svg>
+);
+const GlobeIcon = ()=> (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />
+    </svg>
+);
+const LocationIcon = ()=> (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
+    </svg>
+);
+const FolderIcon = ()=> (
+    <svg className="cdm-icon-primary" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+        <path d="M8 10v4" /><path d="M12 10v2" /><path d="M16 10v6" />
+    </svg>
+);
+const PlusIcon = ()=> (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+);
+const TrendingUpIcon = ()=> (
+    <svg className="cdm-icon-primary" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
+    </svg>
+);
 function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, }) {
     const { sales, projects, quotations, invoices, openAddSaleModal, openAddProjectModal, setActiveTab } = useCRM();
     if (!customer) return null;
@@ -45,9 +91,7 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                             }}
                             className="cdm-btn-outline"
                         >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                            </svg>
+                            <PencilIcon />
                             Edit Details
                         </button>
                     </div>
@@ -58,24 +102,18 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                     {/* Contact Information */}
                     <div className="cdm-card">
                         <div className="cdm-card-heading">
-                            <svg className="cdm-icon-primary" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                            </svg>
+                            <span className="cdm-icon-primary"><PhoneIcon /></span>
                             Contact Information
                         </div>
                         <div className="cdm-info-list">
                             <div style={{ fontWeight: 600, color: '#0f172a' }}>{customer.contactPerson}</div>
                             <div className="cdm-info-row">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                                </svg>
+                                <span style={{color:'#94a3b8'}}><PhoneIcon /></span>
                                 <a href={`tel:${customer.phone}`}>{customer.phone}</a>
                             </div>
                             {customer.email && (
                                 <div className="cdm-info-row">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                                    </svg>
+                                   <EmailIcon />
                                     <a href={`mailto:${customer.email}`}>{customer.email}</a>
                                 </div>
                             )}
@@ -91,9 +129,7 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                     {/* Company Information */}
                     <div className="cdm-card">
                         <div className="cdm-card-heading">
-                            <svg className="cdm-icon-primary" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" />
-                            </svg>
+                            <BuildingIcon />
                             Company Information
                         </div>
                         <div className="cdm-info-list">
@@ -103,9 +139,7 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                             </div>
                             {customer.website && (
                                 <div className="cdm-info-row">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />
-                                    </svg>
+                                   <GlobeIcon />
                                     <a
                                         href={customer.website.startsWith('http') ? customer.website : `https://${customer.website}`}
                                         target="_blank"
@@ -121,9 +155,7 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                             )}
                             {(customer.city || customer.state || customer.address) && (
                                 <div className="cdm-info-row" style={{ alignItems: 'flex-start' }}>
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
-                                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
-                                    </svg>
+                                    <LocationIcon />
                                     <span>{[customer.address, customer.city, customer.state].filter(Boolean).join(', ')}</span>
                                 </div>
                             )}
@@ -160,10 +192,7 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div className="cdm-section-header">
                         <h4 className="cdm-section-title">
-                            <svg className="cdm-icon-primary" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
-                                <path d="M8 10v4" /><path d="M12 10v2" /><path d="M16 10v6" />
-                            </svg>
+                           <FolderIcon />
                             Projects ({customerProjects.length})
                         </h4>
                         <button
@@ -175,15 +204,13 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                             }}
                             className="cdm-link-btn"
                         >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
+                           <PlusIcon />
                             Add Project
                         </button>
                     </div>
 
                     {customerProjects.length === 0 ? (
-                        <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '4px 0' }}>No active projects for this customer.</p>
+                        <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0.5rem 0' }}>No active projects for this customer.</p>
                     ) : (
                         <div className="cdm-projects-grid">
                             {customerProjects.map((proj) => (
@@ -214,9 +241,7 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div className="cdm-section-header">
                         <h4 className="cdm-section-title">
-                            <svg className="cdm-icon-primary" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
-                            </svg>
+                            <TrendingUpIcon />
                             Sales & Opportunities ({customerSales.length})
                         </h4>
                         <button
@@ -228,15 +253,13 @@ function CustomerDetailModal({ isOpen, onClose, customer, onEdit = () => { }, })
                             }}
                             className="cdm-link-btn"
                         >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
+                            <PlusIcon />
                             Add Sale
                         </button>
                     </div>
 
                     {customerSales.length === 0 ? (
-                        <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '4px 0' }}>No sales opportunities logged yet.</p>
+                        <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0.5rem 0' }}>No sales opportunities logged yet.</p>
                     ) : (
                         <div className="cdm-sales-list">
                             {customerSales.map((sale) => (

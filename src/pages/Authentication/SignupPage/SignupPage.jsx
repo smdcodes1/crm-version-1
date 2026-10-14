@@ -2,15 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabase/supabaseClient';
 import LoadingIndicator from '../../../components/LoadingIndicator/LoadingIndicator';
+import { Toaster } from 'react-hot-toast';
+import toast from "react-hot-toast";
 import "./SignupPage.css";
 function SignupPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match.');
+      return;
+    }
     setLoading(true);
     // console.log(username,password);
     try {
@@ -25,19 +32,21 @@ function SignupPage() {
       });
       if (error) {
         console.error("Error on signing up :", error.message);
-        alert("Error on signing up :" + error.message);
+        toast.error(`Error signing up: ${error.message}`);
       } else {
+        toast.success('Successfully signed up!');
         navigate('/login');
       }
 
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
   };
   return (
     <div className='register'>
+      <Toaster position='top-right' reverseOrder={false} />
       <form onSubmit={handleSubmit} className="form-container">
         <h1>Register</h1>
         <input
@@ -56,12 +65,19 @@ function SignupPage() {
           placeholder="Password"
           required
         />
+        <input
+          className="form-input"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Confirm Password"
+          required
+        />
 
-        {loading ? <LoadingIndicator /> :
-          <button className="form-button" type="submit">
-            Sign up
-          </button>
-        }
+        <button className="form-button" type="submit">
+          {loading ? <LoadingIndicator /> : 'Sign up'}
+        </button>
+
         <div>
           <p>Have an account? <span style={{ cursor: 'pointer' }} onClick={() => navigate('/login')}>Sign in please</span></p>
         </div>

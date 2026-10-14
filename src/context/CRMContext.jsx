@@ -68,7 +68,169 @@ export const CRMProvider = ({ children }) => {
     const [notificationStatus, setNotificationStatus] = useState(() =>
         getInitialNotificationStatus(user?.id)
     );
+    // For search by date 
+    const fetchCustomersByDate = async (startDate, endDate) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            let query = supabase.from('customers').select('*').eq('user_id', user.id);
+            if (startDate && endDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`).lte('created_at', `${endDate}T23:59:59.999Z`);
+            } else if (startDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`);
+            } else if (endDate) {
+                query = query.lte('created_at', `${endDate}T23:59:59.999Z`);
+            }
 
+            const { data, error } = await query;
+            if (error) {
+                console.error("Error fetching customers by date:", error);
+                return;
+            }
+            if (data) {
+                const mapped = data.map(c => ({
+                    id: c.id,
+                    companyName: c.company_name,
+                    contactPerson: c.contact_person,
+                    email: c.email,
+                    phone: c.phone,
+                    whatsapp: c.whatsapp,
+                    industry: c.industry,
+                    website: c.website,
+                    address: c.address,
+                    city: c.city,
+                    state: c.state,
+                    notes: c.notes,
+                    status: c.status,
+                    createdAt: c.created_at,
+                    updatedAt: c.updated_at,
+                }));
+                setCustomers(mapped);
+            }
+        }
+    };
+    const fetchQuotationsByDate = async (startDate, endDate) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            let query = supabase.from('quotations').select('*').eq('user_id', user.id);
+            if (startDate && endDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`).lte('created_at', `${endDate}T23:59:59.999Z`);
+            } else if (startDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`);
+            } else if (endDate) {
+                query = query.lte('created_at', `${endDate}T23:59:59.999Z`);
+            }
+
+            const { data, error } = await query;
+            if (error) {
+                console.error("Error fetching quotations by date:", error);
+                return;
+            }
+            if (data) {
+                const mapped = data.map(c => ({
+                    id: c.id,
+                    userId: c.user_id,
+                    quotationNumber: c.quotation_number,
+                    customerId: c.customer_id,
+                    customerName: c.customer_name,
+                    quotationDate: c.quotation_date,
+                    validUntil: c.valid_until,
+                    items: c.items,
+                    subtotal: c.subtotal,
+                    discount: c.discount,
+                    taxPercentage: c.tax_percentage,
+                    tax: c.tax,
+                    total: c.total,
+                    status: c.status,
+                    notes: c.notes,
+                    createdAt: c.created_at,
+
+                }));
+                setQuotations(mapped);
+            }
+        }
+    };
+    const fetchInvoicesByDate = async (startDate, endDate) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            let query = supabase.from('invoices').select('*').eq('user_id', user.id);
+            if (startDate && endDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`).lte('created_at', `${endDate}T23:59:59.999Z`);
+            } else if (startDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`);
+            } else if (endDate) {
+                query = query.lte('created_at', `${endDate}T23:59:59.999Z`);
+            }
+
+            const { data, error } = await query;
+            if (error) {
+                console.error("Error fetching invoices by date:", error);
+                return;
+            }
+            if (data) {
+                const mapped = data.map(c => ({
+                    id: c.id,
+                    userId: c.user_id,
+                    invoiceNumber: c.invoice_number,
+                    quotationId: c.quotation_id,
+                    quotationNumber: c.quotation_number,
+                    customerId: c.customer_id,
+                    customerName: c.customer_name,
+                    invoiceDate: c.invoice_date,
+                    dueDate: c.due_date,
+                    items: c.items,
+                    subtotal: c.subtotal,
+                    taxPercentage: c.tax_percentage,
+                    tax: c.tax,
+                    total: c.total,
+                    paymentStatus: c.payment_status,
+                    paidAmount: c.paid_amount,
+                    notes: c.notes,
+                    createdAt: c.created_at,
+
+                }));
+                setInvoices(mapped);
+            }
+        }
+    };
+    const fetchSalesByDate = async (startDate, endDate) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            let query = supabase.from('sales').select('*').eq('user_id', user.id);
+            if (startDate && endDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`).lte('created_at', `${endDate}T23:59:59.999Z`);
+            } else if (startDate) {
+                query = query.gte('created_at', `${startDate}T00:00:00.000Z`);
+            } else if (endDate) {
+                query = query.lte('created_at', `${endDate}T23:59:59.999Z`);
+            }
+
+            const { data, error } = await query;
+            if (error) {
+                console.error("Error fetching sales by date:", error);
+                return;
+            }
+            if (data) {
+                const mapped = data.map(c => ({
+                    id: c.id,
+                    userId: c.user_id,
+                    customerId: c.customer_id,
+                    customerName: c.customer_name,
+                    contactNumber: c.contact_number,
+                    service: c.service,
+                    industry: c.industry,
+                    proposalShared: c.proposal_shared,
+                    proposalValue: c.proposal_value,
+                    status: c.status,
+                    remarks: c.remarks,
+                    saleDate: c.sale_date,
+                    reminder: c.reminder,
+                    createdAt: c.created_at,
+                    updatedAt: c.updated_at,
+                }));
+                setSales(mapped);
+            }
+        }
+    };
     useEffect(() => {
         const unsubscribe = subscribeToNotifications((notif) => {
             setNotifications((prev) => [notif, ...prev]);
@@ -387,9 +549,15 @@ export const CRMProvider = ({ children }) => {
         return newSale;
     };
     const updateSale = async (id, data) => {
+        const existingSale = sales.find((s) => s.id === id);
+        const existingFollowUp = followUps.find((f) => f.saleId === id);
+        const hadReminder = Boolean(existingSale?.reminder?.enabled || existingFollowUp);
+
+        const now = new Date().toISOString();
         setSales((prev) =>
-            prev.map((s) => (s.id === id ? { ...s, ...data, updatedAt: new Date().toISOString() } : s))
+            prev.map((s) => (s.id === id ? { ...s, ...data, updatedAt: now } : s))
         );
+
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
             const dbPayload = {
@@ -410,6 +578,95 @@ export const CRMProvider = ({ children }) => {
             Object.keys(dbPayload).forEach(key => dbPayload[key] === undefined && delete dbPayload[key]);
             const { error } = await supabase.from('sales').update(dbPayload).eq('id', id).eq('user_id', user.id);
             if (error) console.error('Error updating sale:', error);
+        }
+
+        // If reminder is enabled in the update
+        if (data.reminder?.enabled && data.reminder.date) {
+            if (!hadReminder) {
+                // If NO reminder was already set, create a follow-up record and notify
+                const newFollowUpId = `fu-${Date.now()}`;
+                const newFollowUp = {
+                    id: newFollowUpId,
+                    saleId: id,
+                    customerId: data.customerId || existingSale?.customerId,
+                    customerName: data.customerName || existingSale?.customerName,
+                    reminderDate: data.reminder.date,
+                    reminderTime: data.reminder.time || '10:00',
+                    note: data.reminder.note || `Follow up with ${data.customerName || existingSale?.customerName}`,
+                    completed: false,
+                    createdAt: now,
+                };
+                setFollowUps((prev) => [newFollowUp, ...prev]);
+
+                if (user) {
+                    const followUpload = {
+                        id: newFollowUpId,
+                        user_id: user.id,
+                        sale_id: newFollowUp.saleId,
+                        customer_id: newFollowUp.customerId,
+                        customer_name: newFollowUp.customerName,
+                        reminder_date: newFollowUp.reminderDate,
+                        reminder_time: newFollowUp.reminderTime,
+                        note: newFollowUp.note,
+                        completed: newFollowUp.completed,
+                        created_at: newFollowUp.createdAt,
+                    };
+                    const { error } = await supabase.from('follow_ups').insert([followUpload]);
+                    if (error) console.error('Error inserting follow ups on update sale:', error);
+                }
+
+                triggerNotification(
+                    'Follow-up Reminder Created',
+                    `Follow up with ${data.customerName || existingSale?.customerName} on ${data.reminder.date}`,
+                    'followup'
+                );
+            } else {
+                // Reminder already existed: update existing follow-up record
+                setFollowUps((prev) =>
+                    prev.map((f) =>
+                        (f.saleId === id || (existingFollowUp && f.id === existingFollowUp.id))
+                            ? {
+                                ...f,
+                                customerId: data.customerId || f.customerId,
+                                customerName: data.customerName || f.customerName,
+                                reminderDate: data.reminder.date,
+                                reminderTime: data.reminder.time || f.reminderTime || '10:00',
+                                note: data.reminder.note || f.note,
+                                completed: false,
+                            }
+                            : f
+                    )
+                );
+
+                if (user) {
+                    const updatePayload = {
+                        customer_id: data.customerId || existingSale?.customerId,
+                        customer_name: data.customerName || existingSale?.customerName,
+                        reminder_date: data.reminder.date,
+                        reminder_time: data.reminder.time || '10:00',
+                        note: data.reminder.note || (existingFollowUp ? existingFollowUp.note : `Follow up with ${data.customerName || existingSale?.customerName}`),
+                        completed: false,
+                    };
+                    const { error } = await supabase
+                        .from('follow_ups')
+                        .update(updatePayload)
+                        .eq('sale_id', id)
+                        .eq('user_id', user.id);
+                    if (error) console.error('Error updating follow up on sale update:', error);
+                }
+
+                triggerNotification(
+                    'Sale Updated',
+                    `${data.service || existingSale?.service} for ${data.customerName || existingSale?.customerName} updated.`,
+                    'sale'
+                );
+            }
+        } else {
+            // triggerNotification(
+            //     'Sale Updated',
+            //     `${data.service || existingSale?.service} for ${data.customerName || existingSale?.customerName} updated.`,
+            //     'sale'
+            // );
         }
     };
     const deleteSale = async (id) => {
@@ -467,11 +724,11 @@ export const CRMProvider = ({ children }) => {
             const { error } = await supabase.from('quotations').insert([dbPayload]);
             if (error) console.error('Error inserting quotation:', error);
         }
-        // triggerNotification(
-        //     'Quotation Generated',
-        //     `Quotation ${newQuote.quotationNumber} created for ${newQuote.customerName}`,
-        //     'quotation'
-        // );
+        triggerNotification(
+            'Quotation Generated',
+            `Quotation ${newQuote.quotationNumber} created for ${newQuote.customerName}`,
+            'quotation'
+        );
         return newQuote;
     };
     const updateQuotation = async (id, data) => {
@@ -586,11 +843,11 @@ export const CRMProvider = ({ children }) => {
             const { error } = await supabase.from('invoices').insert([dbPayload]);
             if (error) console.error('Error inserting quotation:', error);
         }
-        // triggerNotification(
-        //     'Invoice Generated',
-        //     `Invoice ${newInvoice.invoiceNumber} created from ${quotation.quotationNumber} for ${newInvoice.customerName}`,
-        //     'invoice'
-        // );
+        triggerNotification(
+            'Invoice Generated',
+            `Invoice ${newInvoice.invoiceNumber} created from ${quotation.quotationNumber} for ${newInvoice.customerName}`,
+            'invoice'
+        );
         return newInvoice;
     };
     const updateInvoice = async (id, data) => {
@@ -661,7 +918,7 @@ export const CRMProvider = ({ children }) => {
             const { error } = await supabase.from('projects').insert([dbPayload]);
             if (error) console.error('Error inserting projects:', error);
         }
-        // triggerNotification('New Project Created', `${newProj.projectName} started for ${newProj.customerName}`);
+        triggerNotification('New Project Created', `${newProj.projectName} started for ${newProj.customerName}`);
         return newProj;
     };
     const updateProject = async (id, data) => {
@@ -702,25 +959,40 @@ export const CRMProvider = ({ children }) => {
 
     // Follow-ups handlers
     const toggleFollowUpComplete = async (id) => {
-        const followUp = followUps.find((f) => f.id === id);
+        const followUp = followUps.find((f) => f.id === id || f.saleId === id);
+        const actualId = followUp ? followUp.id : id;
+        const saleId = followUp ? followUp.saleId : id;
         const newCompletedStatus = followUp ? !followUp.completed : true;
 
         setFollowUps((prev) =>
-            prev.map((f) => (f.id === id ? { ...f, completed: newCompletedStatus } : f))
+            prev.map((f) => (f.id === actualId || f.saleId === saleId ? { ...f, completed: newCompletedStatus } : f))
         );
 
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-            const { error } = await supabase
+
+            const { error: editError } = await supabase
                 .from('follow_ups')
                 .update({ completed: newCompletedStatus })
-                .eq('id', id)
+                .eq('id', actualId)
                 .eq('user_id', user.id);
 
-            if (error) console.error('Error updating follow_up:', error);
+            if (editError) console.error('Error updating follow_up:', editError.message);
+            const reminderPayload = followUp && followUp.reminder ? { ...followUp.reminder, completed: newCompletedStatus } : null;
+
+            const { error: updateError } = await supabase
+                .from('sales')
+                .update({ reminder: reminderPayload })
+                .eq('id', saleId)
+                .eq('user_id', user.id);
+
+            if (updateError) console.error('Error updating sales reminder:', updateError.message);
         }
+
     };
     const deleteFollowUp = async (id) => {
+        const followUp = followUps.find((f) => f.id === id || f.saleId === id);
+        const newCompletedStatus = followUp ? !followUp.completed : true;
         // Clear from follow-ups state (handles both follow-up ID and sale ID)
         setFollowUps((prev) => prev.filter((f) => f.id !== id && f.saleId !== id));
 
@@ -729,13 +1001,18 @@ export const CRMProvider = ({ children }) => {
 
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-            const { error } = await supabase
+            const { error: deleteError } = await supabase.from('follow_ups').update({ completed: newCompletedStatus }).eq('sale_id', id).eq('user_id', user.id);
+            if (deleteError) console.error('Error deleting follow_up:', deleteError.message);
+
+            const { error: updateError } = await supabase
                 .from('sales')
                 .update({ reminder: null })
                 .eq('id', id)
                 .eq('user_id', user.id);
-            if (error) console.error('Error updating follow_up:', error);
+            if (updateError) console.error('Error updating follow_up:', updateError.message);
+
         }
+        // triggerNotification('Follow Up deleted', 'The follow-up has been deleted from upcoming follow-up remainders');
     };
     // Notification handlers
     const markNotificationRead = (id) => {
@@ -762,7 +1039,7 @@ export const CRMProvider = ({ children }) => {
         // localStorage.removeItem(STORAGE_KEYS.PROJECTS);
         // localStorage.removeItem(STORAGE_KEYS.FOLLOWUPS);
 
-        // triggerNotification('Data Reset', 'Sample CRM data restored successfully.');
+        triggerNotification('Data Reset', 'Sample CRM data restored successfully.');
     };
 
     const exportData = () => {
@@ -788,7 +1065,7 @@ export const CRMProvider = ({ children }) => {
             if (data.invoices && Array.isArray(data.invoices)) setInvoices(data.invoices);
             if (data.projects && Array.isArray(data.projects)) setProjects(data.projects);
             if (data.followUps && Array.isArray(data.followUps)) setFollowUps(data.followUps);
-            // triggerNotification('Data Imported', 'CRM database loaded successfully.');
+            triggerNotification('Data Imported', 'CRM database loaded successfully.');
             return true;
         } catch (err) {
             console.error('Import failed', err);
@@ -847,6 +1124,10 @@ export const CRMProvider = ({ children }) => {
             resetToSampleData,
             exportData,
             importData,
+            fetchCustomersByDate,
+            fetchQuotationsByDate,
+            fetchInvoicesByDate,
+            fetchSalesByDate,
         }}>
             {children}
         </CRMContext.Provider>

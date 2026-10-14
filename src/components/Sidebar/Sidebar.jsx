@@ -6,7 +6,7 @@ import { useCRM } from '../../context/CRMContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabase/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
-
+import Swal from 'sweetalert2';
 // Placeholder data for navigation items
 const primaryNavItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -84,7 +84,18 @@ function Sidebar({ mobileOpen, onCloseMobile }) {
 
     };
     const handleLogout = async () => {
-        if (window.confirm('Are you sure you want to log out of CRM?')) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to log out of CRM ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Logout!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+        });
+        if (result.isConfirmed) {
             if (user?.id) {
                 localStorage.removeItem(`notifications_enabled_${user.id}`);
                 setNotificationStatus('default');

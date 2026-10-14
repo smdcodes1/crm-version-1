@@ -5,49 +5,9 @@ import BarChart from '../../components/BarChart/BarChart';
 import './ReportsView.css';
 import { useCRM } from '../../context/CRMContext';
 import { formatINR } from '../../utils/Formatters';
-// const statsData = [
-//   {
-//     title: 'TOTAL WON REVENUE',
-//     value: '₹1,60,000',
-//     subtitle: 'Closed sales total',
-//     icon: <ReceiptDollarIcon />,
-//     colorScheme: 'green',
-//   },
-//   {
-//     title: 'WIN RATE',
-//     value: '40%',
-//     subtitle: '2 of 5 opportunities',
-//     icon: <CheckCircleIcon />,
-//     colorScheme: 'purple',
-//   },
-//   {
-//     title: 'AVERAGE DEAL SIZE',
-//     value: '₹80,000',
-//     subtitle: 'Per closed deal',
-//     icon: <TrendingUpIcon />,
-//     colorScheme: 'blue',
-//     valueColor: '#7c3aed',
-//   },
-//   {
-//     title: 'PIPELINE VOLUME',
-//     value: '₹4,85,000',
-//     subtitle: 'Total proposal value',
-//     icon: <DocumentIcon />,
-//     colorScheme: 'red',
-//   },
-// ];
-// const INDUSTRY_DATA = [
-//   { label: 'IT & Software', count: 1, color: '#7c3aed' },
-//   { label: 'Retail & E-commerce', count: 1, color: '#8b5cf6' },
-//   { label: 'Manufacturing', count: 1, color: '#a855f7' },
-//   { label: 'Healthcare', count: 1, color: '#c084fc' },
-//   { label: 'Logistics & Supply', count: 1, color: '#e9d5ff' },
-// ];
+
 const COLORS = ['#7c3aed', '#9333ea', '#a855f7', '#c084fc', '#e9d5ff', '#6366f1'];
-// const clients = [
-//     { id: 1, name: 'Apex Logistics', closedDeals: 1, revenue: '₹1,20,000' },
-//     { id: 2, name: 'XYZ Ltd', closedDeals: 1, revenue: '₹40,000' },
-//   ];
+
 function ReportsView() {
   const {customers, sales}= useCRM();
   // Metrics
@@ -68,6 +28,7 @@ function ReportsView() {
     value: industryMap[key],
   }));
 const total = industryData.reduce((sum, item) => sum + item.value, 0);
+
   const size = 220;
   const strokeWidth = 34;
   const radius = (size - strokeWidth) / 2;
@@ -98,17 +59,7 @@ const topCustomers = Object.values(customerRevenueMap).sort((a, b) => b.revenue 
 
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-          {/* {statsData.map((stat, index) => (
-            <StatCard
-              key={index}
-              title={stat.title}
-              value={stat.value}
-              subtitle={stat.subtitle}
-              icon={stat.icon}
-              colorScheme={stat.colorScheme}
-              valueColor={stat.valueColor}
-            />
-          ))} */}
+        
           <StatCard
               // key={index}
               title="Total Won Revenue"
@@ -125,7 +76,7 @@ const topCustomers = Object.values(customerRevenueMap).sort((a, b) => b.revenue 
               subtitle={`${wonSales.length} of ${sales.length} opportunities`}
               icon={<Award/>}
               colorScheme="purple"
-              // valueColor={stat.valueColor}
+             
           />
           <StatCard
               // key={index}

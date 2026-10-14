@@ -187,6 +187,21 @@
   justify-content: space-between;
   background: rgba(249, 250, 251, 0.6);
 }
+.unread-notification-count {
+  font-size: 0.875rem;
+  background-color: #ede9fe;
+  color: #6d28d9;
+  padding: 0.125rem 0.5rem;
+  border-radius: 50%;
+  font-weight: 600;
+}
+.clear-notifications-count {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
 .pending-followup-header {
   font-size: 11px;
   font-weight: 600;
@@ -197,6 +212,24 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
+}
+.pending-followup-array {
+  background: #fff;
+  padding: 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ede9fe;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.mark-completed-btn {
+  padding: 0.25rem;
+  color: #9ca3af;
+  border-radius: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .divider {

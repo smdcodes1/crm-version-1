@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingIndicator from "../../../components/LoadingIndicator/LoadingIndicator";
+import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import {supabase} from "../../../supabase/supabaseClient";
 import "./SigninPage.css";
 
 function SignninPage() {
   const [username, setUsername]= useState('');
   const [password, setPassword]= useState('');
-  const [loading, setLoading]= useState('');
+  const [loading, setLoading]= useState(false);
   // const [error, setError]= useState(null);
   const navigate= useNavigate();
   const handleSubmit = async (e) => {
@@ -21,18 +23,20 @@ function SignninPage() {
             });
             if (error) {
                 console.error("Error on signing in :", error.message);
-                alert("Error on signing in :" + error.message);
+                toast.error(`Error signing in: ${error.message}`);
             } else {
+                toast.success('Successfully signed in!');
                 navigate('/', {replace: true});
             }
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message || 'An unexpected error occurred.');
         } finally {
             setLoading(false);
         }
     };
   return (
     <div className='login'>
+      <Toaster position="top-right" reverseOrder={false} />
       <form onSubmit={handleSubmit} className="form-container">
         <h1>Login</h1>
         <input
@@ -52,11 +56,12 @@ function SignninPage() {
           required
         />
 
-        {loading ? <LoadingIndicator /> :
-          <button className="form-button" type="submit">
-            Login
+   
+          <button className="form-button" type="submit" disabled={loading}>
+            {loading ? <LoadingIndicator/> : 'Login'}
+       
           </button>
-        }
+   
         <div>
           <p>Not registered? <span style={{ cursor: 'pointer' }} onClick={() => navigate('/register')}>Signup please</span></p>
         </div>

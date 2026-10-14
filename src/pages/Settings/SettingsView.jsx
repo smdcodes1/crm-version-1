@@ -1,33 +1,27 @@
-import { Building,Save,CheckCircle2,Bell,Database,Download,RotateCcw } from 'lucide-react';
-import React, { useState,useEffect } from 'react';
+import { Building, Save, CheckCircle2, Bell, Database, Download, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import './SettingsView.css';
 import { useAuth } from '../../context/AuthContext';
 import { useCRM } from '../../context/CRMContext';
-import { requestNotificationPermission,triggerNotification } from '../../utils/Notification';
+import { requestNotificationPermission, triggerNotification } from '../../utils/Notification';
+import Swal from 'sweetalert2';
 function SettingsView() {
-  // const [formData, setFormData] = useState({
-  //   companyLegalName: '',
-  //   gstinTaxId: '',
-  //   billingEmail: '',
-  //   officialPhone: '',
-  //   defaultGstRate: '',
-  //   baseCurrency: 'INR (₹)',
-  // });
-   const {profile, updateProfile,user }= useAuth();
-    const {customers, sales, quotations, invoices, projects, followUps,notificationStatus,setNotificationStatus }= useCRM();
-  
+
+  const { profile, updateProfile, user } = useAuth();
+  const { customers, sales, quotations, invoices, projects, followUps, notificationStatus, setNotificationStatus } = useCRM();
+
   // const [notifState, setNotifState] = useState(() =>
   //   typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default'
   // );
-  
-  const [companyName, setCompanyName]= useState(profile.companyName);
-  const [gstin, setGstin]= useState(profile.gstin);
-  const [email, setEmail]= useState(profile.email);
-  const [phone, setPhone]= useState(profile.phone);
-  const [defaultTax, setDefaultTax]= useState(18);
-  const [currency,setCurrency] = useState('INR (₹)');
-  const [savedSuccess, setSavedSuccess]= useState(false);
- 
+
+  const [companyName, setCompanyName] = useState(profile.companyName);
+  const [gstin, setGstin] = useState(profile.gstin);
+  const [email, setEmail] = useState(profile.email);
+  const [phone, setPhone] = useState(profile.phone);
+  const [defaultTax, setDefaultTax] = useState(18);
+  const [currency, setCurrency] = useState('INR (₹)');
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
   // const handleEnableNotifications = async () => {
   //   if (!('Notification' in window)) {
   //     alert('This browser does not support desktop notifications.');
@@ -51,7 +45,7 @@ function SettingsView() {
     const granted = await requestNotificationPermission();
     if (granted) {
       setNotificationStatus('granted');
-      
+
       // Save to localStorage if currentUser exists
       if (user?.id) {
         localStorage.setItem(`notifications_enabled_${user.id}`, 'granted');
@@ -69,10 +63,7 @@ function SettingsView() {
       }
     }
   };
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({ ...prev, [name]: value }));
-  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     updateProfile({ companyName, gstin, email, phone });
@@ -97,7 +88,7 @@ function SettingsView() {
   //   link.click();
   //   URL.revokeObjectURL(url);
   // };
-  const handleDownloadBackup = ()=> {
+  const handleDownloadBackup = () => {
     const exportData = {
       customers,
       sales,
@@ -117,11 +108,20 @@ function SettingsView() {
     downloadAnchor.click();
     downloadAnchor.remove();
   };
-  const handleResetData = () => {
-    const confirmReset = window.confirm(
-      'Are you sure you want to reset all the data back to the default demonstration dataset?'
-    );
-    if (confirmReset) {
+  const handleResetData = async () => {
+
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Are you sure you want to reset all the data back to the default demonstration dataset?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Confirm!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    });
+    if (result.isConfirmed) {
       // LocalStorage reset logic
       localStorage.clear();
       window.location.reload();
@@ -163,8 +163,8 @@ function SettingsView() {
         <div className="org-card">
           {/* Header with Title & Icon */}
           <div className="org-header">
-            <Building color='#7c3aed'/>
-           
+            <Building color='#7c3aed' />
+
             <h2>Organization &amp; Tax Profile</h2>
           </div>
 
@@ -180,7 +180,7 @@ function SettingsView() {
                   type="text"
                   className="form-input"
                   value={companyName}
-                  onChange={(e)=> setCompanyName(e.target.value)}
+                  onChange={(e) => setCompanyName(e.target.value)}
                 />
               </div>
 
@@ -193,7 +193,7 @@ function SettingsView() {
                   type="text"
                   className="form-input"
                   value={gstin}
-                  onChange={(e)=> setGstin(e.target.value)}
+                  onChange={(e) => setGstin(e.target.value)}
                 />
               </div>
 
@@ -206,7 +206,7 @@ function SettingsView() {
                   type="email"
                   className="form-input"
                   value={email}
-                  onChange={(e)=> setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -219,7 +219,7 @@ function SettingsView() {
                   type="text"
                   className="form-input"
                   value={phone}
-                  onChange={(e)=> setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
 
@@ -232,7 +232,7 @@ function SettingsView() {
                   type="text"
                   className="form-input"
                   value={defaultTax}
-                  onChange={(e)=> setDefaultTax(e.target.value)}
+                  onChange={(e) => setDefaultTax(e.target.value)}
                 />
               </div>
 
@@ -245,16 +245,17 @@ function SettingsView() {
                   type="text"
                   className="form-input"
                   value={currency}
-                  onChange={(e)=> setCurrency(e.target.value)}
+                  // onChange={(e)=> setCurrency(e.target.value)}
+                  disabled
                 />
               </div>
             </div>
 
             {/* Action Button */}
             <div className="form-actions">
-             {savedSuccess ? 
-             <div style={{fontSize:'12px',fontWeight:600,color:'#7c3aed',display:'flex',gap:'1px',alignItems:'center'}}>
-              {/* <svg
+              {savedSuccess ?
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#7c3aed', display: 'flex', gap: '1px', alignItems: 'center' }}>
+                  {/* <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
@@ -269,14 +270,14 @@ function SettingsView() {
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="8 12 11 15 16 9" />
               </svg> */}
-              <CheckCircle2 color='#03ac13'/>
-              <span> Preferences saved successfully!</span>
-             </div>
-            : <span />
-            }
+                  <CheckCircle2 color='#03ac13' />
+                  <span> Preferences saved successfully!</span>
+                </div>
+                : <span />
+              }
               <button type="submit" className="btn-save">
                 <Save />
-               
+
                 <span>Save Changes</span>
               </button>
             </div>
@@ -288,8 +289,8 @@ function SettingsView() {
         <div className="alerts-card">
           {/* Section Header */}
           <div className="alerts-header">
-            <Bell color='#7c3aed'/>
-          
+            <Bell color='#7c3aed' />
+
             <h2>Follow-up Alerts &amp; Notifications</h2>
           </div>
 
@@ -314,7 +315,7 @@ function SettingsView() {
               className="btn-enable-notifications"
               onClick={handleEnableNotifications}
             >
-             {notificationStatus === 'granted' ? 'Send Test Alert' : 'Enable Notifications'}
+              {notificationStatus === 'granted' ? 'Send Test Alert' : 'Enable Notifications'}
             </button>
           </div>
         </div>
@@ -324,8 +325,8 @@ function SettingsView() {
         <div className="data-backup-card">
           {/* Header */}
           <div className="data-backup-header">
-            <Database color='#7c3aed'/>
-           
+            <Database color='#7c3aed' />
+
             <h2>Data Management &amp; Backup</h2>
           </div>
 
@@ -347,7 +348,7 @@ function SettingsView() {
                   onClick={handleDownloadBackup}
                 >
                   <Download />
-                  
+
                   <span>Download JSON Backup</span>
                 </button>
               </div>
@@ -369,7 +370,7 @@ function SettingsView() {
                   onClick={handleResetData}
                 >
                   <RotateCcw />
-                 
+
                   <span>Reset Local Storage</span>
                 </button>
               </div>

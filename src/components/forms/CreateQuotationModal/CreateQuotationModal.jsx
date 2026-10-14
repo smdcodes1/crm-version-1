@@ -2,7 +2,23 @@ import React, { useState,useEffect } from 'react';
 import { useCRM } from '../../../context/CRMContext';
 import { formatINR } from '../../../utils/Formatters';
 import { Modal } from '../../Modal/Modal';
+import { TrashIcon } from '../../StatCard/StatCard';
 import "./CreateQuotationModal.css";
+const PlusIcon = ()=> (
+    <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+);
 
 function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustomerId }) {
     const { customers, quotations, getNextQuotationNumber, addQuotation, updateQuotation } = useCRM();
@@ -250,7 +266,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
 
                     </div>
 
-                    <div className="cqm-field">
+                    <div className="cqm-field"> 
                         <label className="cqm-label">Quotation Date</label>
                         <input
                             type="date"
@@ -283,19 +299,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                             id="quote-add-item-btn"
                             className="cqm-btn-add"
                         >
-                            <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <line x1="12" y1="5" x2="12" y2="19" />
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
+                            <PlusIcon />
                             Add Service
                         </button>
                     </div>
@@ -367,21 +371,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                                                 onClick={() => handleRemoveItem(item.id)}
                                                 className="cqm-btn-trash"
                                             >
-                                                <svg
-                                                    width="16"
-                                                    height="16"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                >
-                                                    <polyline points="3 6 5 6 21 6" />
-                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                                    <line x1="10" y1="11" x2="10" y2="17" />
-                                                    <line x1="14" y1="11" x2="14" y2="17" />
-                                                </svg>
+                                               <TrashIcon /> 
                                             </button>
                                         </td>
                                     </tr>
