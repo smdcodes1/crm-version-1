@@ -86,7 +86,7 @@ function DashboardView() {
         <>
             <div className='title-header'>
                 <div className="title-group">
-                    <h2>Good morning!</h2>
+                    <h2>Hi Welcome!</h2>
                     <p>Here's an overview of your sales activity today.</p>
                 </div>
                 <div className='year-container'>

@@ -8,7 +8,7 @@ import { useCRM } from '../../context/CRMContext';
 import { formatDate, formatINR, getRelativeDay } from '../../utils/Formatters';
 import SaleFormModal from '../../components/forms/SaleFormModal/SaleFormModal';
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
-import { SearchIcon,EditIcon,TrashIcon } from '../../components/StatCard/StatCard';
+import { SearchIcon, EditIcon, TrashIcon } from '../../components/StatCard/StatCard';
 
 // const BellIcon= ()=> (
 //   <svg
@@ -27,20 +27,20 @@ import { SearchIcon,EditIcon,TrashIcon } from '../../components/StatCard/StatCar
 //     <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
 //   </svg>
 // );
-const yearOptions= ['Monthly', 'Quarterly', 'Halfly', 'Yearly'];
+const yearOptions = ['Monthly', 'Quarterly', 'Halfly', 'Yearly'];
 function SalesTrackerView() {
-  const [isLoading, setIsLoading]= useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   // const [sales, setSales]= useState(INITIAL_SALES);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [industryFilter, setIndustryFilter] = useState('All Industries');
   const [editingSale, setEditingSale] = useState(null);
-  const [yearFilter, setYearFilter]= useState('Monthly');
-  const [initialDate, setInitialDate]= useState(() => new Date().toISOString().split('T')[0]);
-  const [finalDate, setFinalDate]= useState(() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 30);
-      return d.toISOString().split('T')[0];
+  const [yearFilter, setYearFilter] = useState('Monthly');
+  const [initialDate, setInitialDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate, setFinalDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
   });
   const { isAddSaleOpen, setIsAddSaleOpen, deleteSale, sales, deleteFollowUp, fetchSalesByDate } = useCRM();
   const statusOptions = ['All Statuses', 'Following', 'Negotiation', 'Won', 'Lost'];
@@ -53,16 +53,16 @@ function SalesTrackerView() {
     const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
 
     switch (filter) {
-        case 'Monthly':
-            return daysDifference <= 30;
-        case 'Quarterly':
-            return daysDifference <= 90;
-        case 'Halfly':
-            return daysDifference <= 180;
-        case 'Annually':
-            return daysDifference <= 365;
-        default:
-            return true;
+      case 'Monthly':
+        return daysDifference <= 30;
+      case 'Quarterly':
+        return daysDifference <= 90;
+      case 'Halfly':
+        return daysDifference <= 180;
+      case 'Annually':
+        return daysDifference <= 365;
+      default:
+        return true;
     }
   };
 
@@ -96,7 +96,7 @@ function SalesTrackerView() {
         (item.industry || '').toLowerCase().includes(term) ||
         String(item.proposalValue || '').toLowerCase().includes(term) ||
         String(item.reminder?.date || '').toLowerCase().includes(term);
-        const matchesDate = isWithinFilter(item.createdAt, yearFilter);
+      const matchesDate = isWithinFilter(item.createdAt, yearFilter);
 
       return matchesStatus && matchesIndustry && matchesSearch && matchesDate;
     });
@@ -164,11 +164,11 @@ function SalesTrackerView() {
     if (result.isConfirmed) {
       await deleteFollowUp(id);
     }
-  }; 
-  const handleSearch= async ()=> {
+  };
+  const handleSearch = async () => {
     setIsLoading(true);
     try {
-      await fetchSalesByDate(initialDate,finalDate);
+      await fetchSalesByDate(initialDate, finalDate);
     } finally {
       setIsLoading(false);
     }
@@ -187,9 +187,9 @@ function SalesTrackerView() {
             onChange={(e) => setYearFilter(e.target.value)}
           >
             {yearOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                    {opt}
-                </option>
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
             ))}
           </select>
           <button onClick={() => {
@@ -197,12 +197,12 @@ function SalesTrackerView() {
             setIsAddSaleOpen(true);
           }}>Add Sale</button>
         </div>
-       
+
       </div>
 
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-         
+
           <StatCard
             // key={index}
             title="Total Sales"
@@ -210,7 +210,7 @@ function SalesTrackerView() {
             subtitle="Oppurtunities logged"
             icon={<TrendingUp />}
             colorScheme="purple"
-     
+
           />
           <StatCard
             // key={index}
@@ -219,7 +219,7 @@ function SalesTrackerView() {
             subtitle="Active pipeline deals"
             icon={<UserCheck />}
             colorScheme="blue"
-       
+
           />
           <StatCard
             // key={index}
@@ -253,25 +253,25 @@ function SalesTrackerView() {
       <div className='projects-controls4'>
         <div className='projects-controls4-left'>
           <input
-              type="date"
-              required
-              value={initialDate}
-              onChange={(e) => setInitialDate(e.target.value)}
-              className="projects-controls4-input"
+            type="date"
+            required
+            value={initialDate}
+            onChange={(e) => setInitialDate(e.target.value)}
+            className="projects-controls4-input"
           />
           <input
-              type="date"
-              required
-              value={finalDate}
-              onChange={(e) => setFinalDate(e.target.value)}
-              className="projects-controls4-input"
+            type="date"
+            required
+            value={finalDate}
+            onChange={(e) => setFinalDate(e.target.value)}
+            className="projects-controls4-input"
           />
-          
+
         </div>
-        <button 
+        <button
           type='button'
           disabled={isLoading}
-          className='search-button-right' 
+          className='search-button-right'
           onClick={handleSearch}
         >
           {isLoading ? 'Searching..' : "Search"}

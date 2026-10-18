@@ -1,10 +1,10 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCRM } from '../../../context/CRMContext';
 import { formatINR } from '../../../utils/Formatters';
 import { Modal } from '../../Modal/Modal';
 import { TrashIcon } from '../../StatCard/StatCard';
 import "./CreateQuotationModal.css";
-const PlusIcon = ()=> (
+const PlusIcon = () => (
     <svg
         width="14"
         height="14"
@@ -48,7 +48,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
         },
     ]);
     const [errors, setErrors] = useState({});
-
+    const [includeTax, setIncludeTax] = useState(false);
     useEffect(() => {
         if (quotationToEdit) {
             setCustomerId(quotationToEdit.customerId || '');
@@ -79,7 +79,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
             setStatus('Sent');
             setDiscount(0);
             setTaxPercentage(18);
-            setNotes('Standard 30-day payment term upon invoice issuance.');
+            setNotes('');
 
             if (defaultCustomerId) {
                 const found = customers.find((c) => c.id === defaultCustomerId);
@@ -98,11 +98,11 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
             setItems([
                 {
                     id: `qi-${Date.now()}`,
-                    service: 'Website & App Development',
-                    description: 'Full stack development',
+                    service: '',
+                    description: '',
                     quantity: 1,
-                    unitPrice: 60000,
-                    total: 60000,
+                    unitPrice: 0,
+                    total: 0,
                 },
             ]);
         }
@@ -155,7 +155,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
     const discountVal = Number(discount) || 0;
     const taxableAmount = Math.max(0, subtotal - discountVal);
     const taxAmount = (taxableAmount * (Number(taxPercentage) || 0)) / 100;
-    const grandTotal = taxableAmount + taxAmount;
+    const grandTotal = taxableAmount + (includeTax ? taxAmount : 0);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -182,7 +182,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
             subtotal,
             discount: discountVal,
             taxPercentage: Number(taxPercentage) || 0,
-            tax: taxAmount,
+            tax: includeTax ? taxAmount : 0,
             total: grandTotal,
             status,
             notes: notes.trim(),
@@ -261,12 +261,12 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                             <option value="Approved">Approved</option>
                             <option value="Rejected">Rejected</option>
                             <option value="Expired">Expired</option>
-                        
+
                         </select>
 
                     </div>
 
-                    <div className="cqm-field"> 
+                    <div className="cqm-field">
                         <label className="cqm-label">Quotation Date</label>
                         <input
                             type="date"
@@ -310,8 +310,8 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                                 <tr>
                                     <th style={{ width: '35%' }}>Service / Item</th>
                                     <th className="cqm-cell-hide-sm" style={{ width: '35%' }}>Description</th>
-                                    <th className="cqm-text-center" style={{ width: '8%',minWidth:'60px' }}>Qty</th>
-                                    <th className="cqm-text-right" style={{ width: '11%',minWidth:'90px' }}>Price (₹)</th>
+                                    <th className="cqm-text-center" style={{ width: '8%', minWidth: '60px' }}>Qty</th>
+                                    <th className="cqm-text-right" style={{ width: '11%', minWidth: '90px' }}>Price (₹)</th>
                                     <th className="cqm-text-right" style={{ width: '11%' }}>Total (₹)</th>
                                     <th className="cqm-text-center" style={{ width: '50px' }}></th>
                                 </tr>
@@ -353,7 +353,6 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                                             <input
                                                 type="number"
                                                 min="0"
-                                                step="500"
                                                 value={item.unitPrice}
                                                 onChange={(e) =>
                                                     handleItemChange(item.id, 'unitPrice', Number(e.target.value))
@@ -371,7 +370,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                                                 onClick={() => handleRemoveItem(item.id)}
                                                 className="cqm-btn-trash"
                                             >
-                                               <TrashIcon /> 
+                                                <TrashIcon />
                                             </button>
                                         </td>
                                     </tr>
@@ -415,8 +414,18 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                         </div>
 
                         <div className="cqm-summary-row">
-                            <span>GST / Tax ({taxPercentage}%):</span>
-                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{formatINR(taxAmount)}</span>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                                <input
+                                    type='checkbox'
+                                    checked={includeTax}
+                                    onChange={(e) => setIncludeTax(e.target.checked)}
+
+                                />
+                                <span>GST / Tax ({taxPercentage}%):</span>
+                            </label>
+
+                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{formatINR(includeTax ? taxAmount : 0)}</span>
+
                         </div>
 
                         <div className="cqm-summary-row cqm-grand-total">

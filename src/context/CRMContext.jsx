@@ -14,12 +14,12 @@ export const useCRM = () => {
 
 export const CRMProvider = ({ children }) => {
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [customers, setCustomers] = useState(INITIAL_CUSTOMERS);
-    const [sales, setSales] = useState(INITIAL_SALES);
-    const [followUps, setFollowUps] = useState(INITIAL_FOLLOWUPS);
-    const [invoices, setInvoices] = useState(INITIAL_INVOICES);
-    const [quotations, setQuotations] = useState(INITIAL_QUOTATIONS);
-    const [projects, setProjects] = useState(INITIAL_PROJECTS);
+    const [customers, setCustomers] = useState([]);
+    const [sales, setSales] = useState([]);
+    const [followUps, setFollowUps] = useState([]);
+    const [invoices, setInvoices] = useState([]);
+    const [quotations, setQuotations] = useState([]);
+    const [projects, setProjects] = useState([]);
     // modal handlers
     const [isAddSaleOpen, setIsAddSaleOpen] = useState(false);
     const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
@@ -782,7 +782,9 @@ export const CRMProvider = ({ children }) => {
         quotationId,
         invoiceDate,
         dueDate,
-        notes
+        notes,
+        subtotal,
+        total
     ) => {
         const quotation = quotations.find((q) => q.id === quotationId);
         if (!quotation) {
@@ -808,10 +810,10 @@ export const CRMProvider = ({ children }) => {
                 unitPrice: item.unitPrice,
                 total: item.total,
             })),
-            subtotal: quotation.subtotal,
+            subtotal: subtotal || quotation.subtotal || '',
             taxPercentage: quotation.taxPercentage || 18,
             tax: quotation.tax,
-            total: quotation.total,
+            total: total || quotation.total || '',
             paymentStatus: 'Unpaid',
             notes: notes || quotation.notes || '',
             createdAt: new Date().toISOString(),

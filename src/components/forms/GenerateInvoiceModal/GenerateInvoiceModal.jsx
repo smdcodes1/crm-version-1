@@ -67,6 +67,7 @@ function GenerateInvoiceModal({isOpen,onClose,preselectedQuotationId}) {
                                     return d.toISOString().split('T')[0];
                                     });
   const [notes, setNotes] = useState('');
+  
   useEffect(() => {
     if (preselectedQuotationId) {
       setSelectedQuotationId(preselectedQuotationId);
@@ -89,7 +90,18 @@ function GenerateInvoiceModal({isOpen,onClose,preselectedQuotationId}) {
       (q.quotationNumber || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (q.customerName || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  const [subtotal, setSubtotal]= useState('');
+  const [discount, setDiscount]= useState('');
+  const [taxAmount, setTaxAmount]= useState('');
+  const taxableAmount = discount ? Math.max(0, subtotal - discount) : subtotal;
+  const totalAmount= Number(taxableAmount) + Number(taxAmount);
+  useEffect(()=> {
+    if (selectedQuotation) {
+      setSubtotal(selectedQuotation.subtotal || '');
+      setDiscount(selectedQuotation.discount || '');
+      setTaxAmount(selectedQuotation.tax || '');
+    }
+  },[selectedQuotation]);
   const handleGenerate = (e) => {
         e.preventDefault();
         if (!selectedQuotation) return;
@@ -98,7 +110,9 @@ function GenerateInvoiceModal({isOpen,onClose,preselectedQuotationId}) {
         selectedQuotation.id,
         invoiceDate,
         dueDate,
-        notes.trim() || selectedQuotation.notes || ''
+        notes.trim() || selectedQuotation.notes || '',
+        subtotal || selectedQuotation.subtotal || '',
+        totalAmount || selectedQuotation.total || ''
         );
 
         setActiveTab('invoices');
@@ -225,9 +239,16 @@ function GenerateInvoiceModal({isOpen,onClose,preselectedQuotationId}) {
                   <div className="gim-totals-summary">
                     <div className="gim-total-line">
                       <span>Subtotal:</span>
-                      <span style={{ fontWeight: 600, color: '#0f172a' }}>
-                        {formatINR(selectedQuotation.subtotal)}
-                      </span>
+                      <input
+                        id="invoice-subtotal-input"
+                        type="number"
+                        min="0"
+                        placeholder="Amount without tax.."
+                        max={selectedQuotation.subtotal}
+                        value={subtotal}
+                        onChange={(e) => setSubtotal(e.target.value)}
+                        className='gim-subtotal-input'
+                      /> 
                     </div>
                     {selectedQuotation.discount > 0 && (
                       <div className="gim-total-line" style={{ color: '#059669' }}>
@@ -243,7 +264,7 @@ function GenerateInvoiceModal({isOpen,onClose,preselectedQuotationId}) {
                     </div>
                     <div className="gim-total-line gim-final-total">
                       <span>Invoice Total:</span>
-                      <span style={{ color: '#7c3aed' }}>{formatINR(selectedQuotation.total)}</span>
+                      <span style={{ color: '#7c3aed' }}>{formatINR(totalAmount)}</span>
                     </div>
                   </div>
                 </div>

@@ -35,7 +35,7 @@ function SignupPage() {
         toast.error(`Error signing up: ${error.message}`);
       } else {
         toast.success('Successfully signed up!');
-        navigate('/login');
+        // navigate('/login');
       }
 
     } catch (err) {

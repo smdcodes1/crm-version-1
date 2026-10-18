@@ -87,7 +87,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
                   value={paidAmount}
                   onChange={(e) => setPaidAmount(e.target.value)}
                   placeholder='Enter amount'
-                  style={{ fontSize: '0.75rem', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', padding: '4px 8px', width: '8rem' }}
+                  className='idm-status-input'
                 />
               </div>)}
             <button
@@ -127,11 +127,11 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
           <div className="idm-doc-header">
             <div>
               <div className="idm-brand">
-                <div className="idm-logo">C</div>
-                <h1 className="idm-company-name">CRM SERVICES PVT LTD</h1>
+                <div className="idm-logo">Z</div>
+                <h1 className="idm-company-name">ZENITA MARKETING PVT LTD</h1>
               </div>
-              <p className="idm-subtext">GSTIN: 29AAAAA0000A1Z5 • Technology Solutions</p>
-              <p className="idm-subtext">Kerala, India • contact@crmportal.com</p>
+              <p className="idm-subtext">GSTIN: 29AAAAA0000A1Z5 • Online Marketing Solutions</p>
+              <p className="idm-subtext">Attingal, Kerala • info@zenitamarketing.com</p>
             </div>
 
             <div className="idm-inv-meta">
@@ -173,7 +173,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
                   <th className="idm-cell-hide-sm">Description</th>
                   <th className="idm-col-center">Qty</th>
                   <th className="idm-col-right">Unit Price</th>
-                  <th className="idm-col-right">Total</th>
+                  <th className="idm-col-right">Invoice Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,9 +197,9 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
               <div style={{ fontWeight: 600, color: '#0f172a' }}>Payment Information:</div>
               <div className="idm-bank-details">
                 <div>Bank: HDFC Bank Limited</div>
-                <div>A/C Name: CRM Services Pvt Ltd</div>
+                <div>A/C Name: Zenita Marketing Pvt Ltd</div>
                 <div>IFSC: HDFC0001234 • A/C No: 50200012345678</div>
-                <div>UPI: crmservices@okhdfcbank</div>
+                <div>UPI: zenitamarketing@okhdfcbank</div>
               </div>
               {invoice.notes && (
                 <p style={{ margin: 0, fontStyle: 'italic', color: '#64748b' }}>

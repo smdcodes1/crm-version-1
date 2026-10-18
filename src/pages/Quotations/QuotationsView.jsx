@@ -11,18 +11,18 @@ import QuotationDetailModal from '../../components/modals/QuotationDetailModal/Q
 import CreateQuotationModal from '../../components/forms/CreateQuotationModal/CreateQuotationModal';
 import GenerateInvoiceModal from "../../components/forms/GenerateInvoiceModal/GenerateInvoiceModal";
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
-import { SearchIcon,ViewIcon,EditIcon,TrashIcon } from '../../components/StatCard/StatCard';
+import { SearchIcon, ViewIcon, EditIcon, TrashIcon } from '../../components/StatCard/StatCard';
 
-const yearOptions= ['Monthly','Quarterly','Halfly','Annually'];
+const yearOptions = ['Monthly', 'Quarterly', 'Halfly', 'Annually'];
 function QuotationsView() {
-  const { quotations, invoices, isCreateQuotationOpen, setIsCreateQuotationOpen, deleteQuotation,fetchQuotationsByDate } = useCRM();
-  const [isLoading, setIsLoading]= useState(false);
-  const [yearFilter, setYearFilter]= useState('Monthly');
-  const [initialDate,setInitialDate]= useState(() => new Date().toISOString().split('T')[0]);
-  const [finalDate,setFinalDate]= useState(() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 30);
-      return d.toISOString().split('T')[0];
+  const { quotations, invoices, isCreateQuotationOpen, setIsCreateQuotationOpen, deleteQuotation, fetchQuotationsByDate } = useCRM();
+  const [isLoading, setIsLoading] = useState(false);
+  const [yearFilter, setYearFilter] = useState('Monthly');
+  const [initialDate, setInitialDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate, setFinalDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
   });
   // const [quotations, setQuotations] = useState(INITIAL_QUOTATIONS);
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,7 +32,7 @@ function QuotationsView() {
   const [viewingQuotation, setViewingQuotation] = useState(null);
   const [invoiceGenQuotationId, setInvoiceGenQuotationId] = useState(null);
 
- const isWithinFilter = (dateString, filter) => {
+  const isWithinFilter = (dateString, filter) => {
     if (!dateString) return false;
     const itemDate = new Date(dateString);
     if (isNaN(itemDate.getTime())) return false;
@@ -41,16 +41,16 @@ function QuotationsView() {
     const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
 
     switch (filter) {
-        case 'Monthly':
-            return daysDifference <= 30;
-        case 'Quarterly':
-            return daysDifference <= 90;
-        case 'Halfly':
-            return daysDifference <= 180;
-        case 'Annually':
-            return daysDifference <= 365;
-        default:
-            return true;
+      case 'Monthly':
+        return daysDifference <= 30;
+      case 'Quarterly':
+        return daysDifference <= 90;
+      case 'Halfly':
+        return daysDifference <= 180;
+      case 'Annually':
+        return daysDifference <= 365;
+      default:
+        return true;
     }
   };
   const filteredQuotationsHeader = quotations.filter(q => isWithinFilter(q.quotationDate || q.createdAt, yearFilter));
@@ -105,10 +105,10 @@ function QuotationsView() {
       }
     }
   };
-  const handleSearch= async ()=> {
+  const handleSearch = async () => {
     setIsLoading(true);
     try {
-      await fetchQuotationsByDate(initialDate,finalDate);
+      await fetchQuotationsByDate(initialDate, finalDate);
     } finally {
       setIsLoading(false);
     }
@@ -121,28 +121,28 @@ function QuotationsView() {
           <p>Manage and issue customer quotations.</p>
         </div>
         <div className='year-container'>
-            <select
-              className="select-filter year-select"
-              value={yearFilter}
-              onChange={(e) => setYearFilter(e.target.value)}
-            >
-              {yearOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                      {opt}
-                  </option>
-              ))}
-            </select>
-            <button onClick={() => {
-              setEditingQuotation(null);
-              setIsCreateQuotationOpen(true);
-            }}>Create Quotation</button>
+          <select
+            className="select-filter year-select"
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+          >
+            {yearOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+          <button onClick={() => {
+            setEditingQuotation(null);
+            setIsCreateQuotationOpen(true);
+          }}>Create Quotation</button>
         </div>
-        
+
       </div>
 
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-        
+
           <StatCard
             // key={index}
             title="Total Quotations"
@@ -150,7 +150,7 @@ function QuotationsView() {
             subtitle="Issued proposals"
             icon={<FileText />}
             colorScheme="purple"
-      
+
           />
           <StatCard
             // key={index}
@@ -159,7 +159,7 @@ function QuotationsView() {
             subtitle="Ready for invoicing"
             icon={<CheckCircle2 />}
             colorScheme="green"
-    
+
           />
           <StatCard
             // key={index}
@@ -177,7 +177,7 @@ function QuotationsView() {
             subtitle="Gross quoted amounts"
             icon={<Trophy />}
             colorScheme="blue"
-       
+
           />
         </div>
       </div>
@@ -198,9 +198,9 @@ function QuotationsView() {
             className="projects-controls2-input"
           />
         </div>
-        <button 
+        <button
           type='button'
-          className='search-button-right' 
+          className='search-button-right'
           onClick={handleSearch}
           disabled={isLoading}
         >

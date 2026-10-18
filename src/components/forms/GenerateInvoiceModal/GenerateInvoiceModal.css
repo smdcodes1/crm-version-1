@@ -313,7 +313,20 @@
 .gim-btn-cancel:hover {
     background-color: #f3f4f6;
 }
-
+.gim-subtotal-input{
+    font-weight: 600;
+    color: #0f172a;
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 4px 8px;
+    width: 8rem;
+    text-align: right;
+    outline: none;
+}
+.gim-subtotal-input:focus{
+    border-color: #7c3aed;
+}
 @media (max-width: 768px) {
     .gim-picker-grid {
         grid-template-columns: 1fr;

@@ -133,11 +133,11 @@ function QuotationDetailModal({isOpen,onClose,quotation,onGenerateInvoice = () =
             <div className="qdm-doc-header">
               <div>
                 <div className="qdm-brand">
-                  <div className="qdm-logo">C</div>
-                  <h1 className="qdm-company-title">CRM SERVICES</h1>
+                  <div className="qdm-logo">Z</div>
+                  <h1 className="qdm-company-title">ZENITA MARKETING PVT LTD</h1>
                 </div>
-                <p className="qdm-subtext">Digital Solutions & Software Engineering</p>
-                <p className="qdm-subtext">Bangalore, India • gst@crmportal.example</p>
+                <p className="qdm-subtext">Online Marketing & Software Solutions</p>
+                <p className="qdm-subtext">Attingal, Kerala • info@zenitamarketing.com</p>
               </div>
 
               <div className="qdm-quote-meta">
