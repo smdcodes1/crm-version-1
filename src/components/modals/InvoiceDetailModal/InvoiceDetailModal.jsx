@@ -4,14 +4,14 @@ import { formatDate, formatINR } from '../../../utils/Formatters';
 import { Modal } from '../../Modal/Modal';
 import { StatusBadge } from '../../StatusBadge/StatusBadge';
 import "./InvoiceDetailModal.css";
-const PrintIcon = ()=> (
+const PrintIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="6 9 6 2 18 2 18 9" />
     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
     <rect width="12" height="8" x="6" y="14" />
   </svg>
 );
-const DocumentIcon = ()=> (
+const DocumentIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
     <polyline points="14 2 14 8 20 8" />
@@ -21,17 +21,19 @@ const DocumentIcon = ()=> (
   </svg>
 );
 function InvoiceDetailModal({ isOpen, onClose, invoice }) {
-  const { updateInvoice } = useCRM();
+  const { updateInvoice,quotations } = useCRM();
   const [status, setStatus] = useState("Unpaid");
   const [paidAmount, setPaidAmount] = useState(0);
-
+  const [selectedQuotationId, setSelectedQuotationId]= useState('');
+  const selectedQuotation = quotations.find((q) => q.id === selectedQuotationId);
   useEffect(() => {
     if (invoice) {
       setStatus(invoice.paymentStatus || "Unpaid");
       setPaidAmount(invoice.paidAmount || 0);
+      setSelectedQuotationId(invoice.quotationId);
     }
   }, [invoice]);
-
+  
   if (!invoice) return null;
 
   const handlePrint = () => {
@@ -128,7 +130,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
             <div>
               <div className="idm-brand">
                 <div className="idm-logo">Z</div>
-                <h1 className="idm-company-name">ZENITA MARKETING PVT LTD</h1>
+                <h1 className="idm-company-name">AJ ZENITA MARKETING PVT LTD</h1>
               </div>
               <p className="idm-subtext">GSTIN: 29AAAAA0000A1Z5 • Online Marketing Solutions</p>
               <p className="idm-subtext">Attingal, Kerala • info@zenitamarketing.com</p>
@@ -164,7 +166,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
           </div>
 
           {/* Items Table */}
-          <div className="idm-table-container">
+          {/* <div className="idm-table-container">
             <table className="idm-table">
               <thead>
                 <tr>
@@ -173,7 +175,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
                   <th className="idm-cell-hide-sm">Description</th>
                   <th className="idm-col-center">Qty</th>
                   <th className="idm-col-right">Unit Price</th>
-                  <th className="idm-col-right">Invoice Total</th>
+                  <th className="idm-col-right">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,8 +191,99 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </div> */}
+          <label className='idm-quotation-details' style={{marginBottom:0}}>
+            2. Inherited Quotation Details 
+          </label>
+          <div className="idm-inherited-box">
+            <div className="idm-inherited-header">
+              <div>
+                <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Quotation Number: </span>
+                <span style={{ fontWeight: 700, color: '#7c3aed', fontFamily: 'monospace' }}>
+                  {selectedQuotation?.quotationNumber}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Company: </span>
+                <span style={{ fontWeight: 700, color: '#0f172a' }}>{selectedQuotation?.customerName}</span>
+              </div>
+            </div>
 
+            {/* Inherited Line Items */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b' }}>Quotation Items:</div>
+              <div className="idm-items-list">
+                {(selectedQuotation?.items || []).map((item) => (
+                  <div key={item.id} className="idm-item-row">
+                    <div>
+                      <div style={{ fontWeight: 500, color: '#0f172a' }}>{item.service}</div>
+                      {item.description && (
+                        <div style={{ fontSize: '0.75rem', color: '#64748b', maxWidth: '340px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {item.description}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginRight: '12px' }}>Qty: {item.quantity}</span>
+                      <span style={{ fontWeight: 600, color: '#0f172a' }}>{formatINR(item.total)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Subtotal, Tax, Total */}
+            <div className="idm-totals-summary">
+              <div className="idm-total-line">
+                <span>Subtotal:</span>
+                <span style={{fontWeight:600,color:'#111827'}}>{formatINR(selectedQuotation?.subtotal)}</span>
+              </div>
+              {selectedQuotation?.discount > 0 && (
+                <div className="idm-total-line" style={{ color: '#059669' }}>
+                  <span>Discount:</span>
+                  <span>-{formatINR(selectedQuotation?.discount)}</span>
+                </div>
+              )}
+              <div className="idm-total-line">
+                <span>Tax ({selectedQuotation?.taxPercentage || 18}% GST):</span>
+                <span style={{ fontWeight: 600, color: '#0f172a' }}>
+                  {formatINR(selectedQuotation?.tax)}
+                </span>
+              </div>
+              
+              <div className="idm-total-line idm-final-total">
+                <span>Quotation Total:</span>
+                <span style={{ color: '#7c3aed' }}>{formatINR(selectedQuotation?.total)}</span>
+              </div>
+              
+              
+            </div>
+          </div>
+          <label className="idm-step-label" style={{marginBottom: 0}}>
+            3. Invoice Details
+          </label>
+          <div className='idm-inherited-box'>
+            <div className='idm-total-line'>
+                <span>Subtotal</span>
+                <span style={{fontWeight:600,color:'#111827'}}>{formatINR(invoice.subtotal)}</span>
+            </div>
+            <div className='idm-summary-row'>
+              <label style={{display:'flex', alignItems:'center', gap:'8px', cursor:'pointer' }}>
+                {/* <input
+                    type='checkbox'
+                    checked={includeTax}
+                    onChange={(e) => setIncludeTax(e.target.checked)}
+
+                /> */}
+                <span>GST / Tax ({invoice.taxPercentage}%):</span>
+              </label>
+              <span style={{fontWeight: 600, color: '#0f172a'}}>{formatINR(invoice.tax)}</span>
+            </div>
+            <div className="idm-total-line idm-final-total">
+              <span>Invoice Total:</span>
+              <span style={{ color: '#7c3aed' }}>{formatINR(invoice.total)}</span>
+            </div>
+          </div>
           {/* Bottom Totals */}
           <div className="idm-bottom-section">
             <div className="idm-payment-info">
@@ -210,7 +303,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
 
             <div className="idm-totals-card">
               <div className="idm-total-row">
-                <span>Subtotal:</span>
+                <span>Invoiced Subtotal:</span>
                 <span style={{ fontWeight: 600, color: '#0f172a' }}>{formatINR(invoice.subtotal)}</span>
               </div>
               <div className="idm-total-row">
@@ -218,7 +311,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
                 <span style={{ fontWeight: 600, color: '#0f172a' }}>{formatINR(invoice.tax)}</span>
               </div>
               <div className="idm-total-row idm-due-total">
-                <span>Total Due:</span>
+                <span>Total Due (Invoiced):</span>
                 <span style={{ color: '#6d28d9' }}>{formatINR(invoice.total)}</span>
               </div>
               {invoice.paidAmount !== undefined && invoice.paidAmount > 0 && (
@@ -230,7 +323,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
             </div>
           </div>
         </div>
-       
+
       </div>
     </Modal>
   );

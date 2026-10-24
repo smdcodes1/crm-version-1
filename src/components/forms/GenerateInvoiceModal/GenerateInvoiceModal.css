@@ -327,6 +327,13 @@
 .gim-subtotal-input:focus{
     border-color: #7c3aed;
 }
+
+.gim-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #475569;
+}
 @media (max-width: 768px) {
     .gim-picker-grid {
         grid-template-columns: 1fr;

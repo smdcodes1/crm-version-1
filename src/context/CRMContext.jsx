@@ -784,6 +784,7 @@ export const CRMProvider = ({ children }) => {
         dueDate,
         notes,
         subtotal,
+        tax,
         total
     ) => {
         const quotation = quotations.find((q) => q.id === quotationId);
@@ -812,7 +813,7 @@ export const CRMProvider = ({ children }) => {
             })),
             subtotal: subtotal || quotation.subtotal || '',
             taxPercentage: quotation.taxPercentage || 18,
-            tax: quotation.tax,
+            tax: tax || quotation.tax || '',
             total: total || quotation.total || '',
             paymentStatus: 'Unpaid',
             notes: notes || quotation.notes || '',
