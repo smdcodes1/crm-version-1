@@ -108,7 +108,7 @@ function DashboardView() {
 
             <div className='stat-cards-wrapper'>
                 <div className="stat-cards-grid">
-                
+
                     <StatCard
                         key="stat-customers"
                         title="Customers"

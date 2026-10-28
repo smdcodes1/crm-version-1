@@ -343,7 +343,7 @@ function SaleFormModal({ isOpen, onClose, saleToEdit, defaultCustomerId }) {
                             id="sale-proposal-value-input"
                             type="number"
                             min="0"
-                            step="1000"
+                       
                             placeholder="e.g. 80000"
                             value={proposalValue}
                             onChange={(e) =>
@@ -395,13 +395,13 @@ function SaleFormModal({ isOpen, onClose, saleToEdit, defaultCustomerId }) {
                         <label className="sfm-label" htmlFor="sale-remarks-input">
                             Remarks
                         </label>
-                        <input
+                        <textarea
                             id="sale-remarks-input"
-                            type="text"
+                            rows={6}
                             placeholder="e.g. Discussed pricing milestones; customer interested in 1-year contract"
                             value={remarks}
                             onChange={(e) => setRemarks(e.target.value)}
-                            className="sfm-input"
+                            className="sfm-text-area"
                         />
                     </div>
                 </div>

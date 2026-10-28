@@ -1,9 +1,10 @@
-import { Building, Save, CheckCircle2, Bell, Database, Download, RotateCcw } from 'lucide-react';
+import { Building, Save, CheckCircle2, Bell, Database, Download, RotateCcw, FileSpreadsheet } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import './SettingsView.css';
 import { useAuth } from '../../context/AuthContext';
 import { useCRM } from '../../context/CRMContext';
 import { requestNotificationPermission, triggerNotification } from '../../utils/Notification';
+import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 function SettingsView() {
 
@@ -127,6 +128,111 @@ function SettingsView() {
       window.location.reload();
     }
   };
+const handleExportExcel = () => {
+  const wb = XLSX.utils.book_new();
+
+    // 1. Customers Sheet
+  const customersData = customers.map((c) => ({
+    ID: c.id,
+    'Company Name': c.companyName,
+    'Contact Person': c.contactPerson,
+    Email: c.email,
+    Phone: c.phone,
+    WhatsApp: c.whatsapp || '',
+    Industry: c.industry || '',
+    Status: c.status,
+    City: c.city || '',
+    State: c.state || '',
+    Address: c.address || '',
+    Website: c.website || '',
+    Notes: c.notes || '',
+    'Created At': c.createdAt,
+    'Updated At': c.updatedAt,
+  }));
+  const customersSheet = XLSX.utils.json_to_sheet(customersData);
+  XLSX.utils.book_append_sheet(wb, customersSheet, 'Customers');
+
+    // 2. Sales Pipeline Sheet
+  const salesData = sales.map((s) => ({
+    ID: s.id,
+    'Customer Name': s.customerName,
+    'Contact Number': s.contactNumber,
+    Service: s.service,
+    Industry: s.industry || '',
+    'Proposal Value (INR)': s.proposalValue,
+    Status: s.status,
+    'Sale Date': s.saleDate,
+    'Proposal Shared': s.proposalShared ? 'Yes' : 'No',
+    Remarks: s.remarks || '',
+    'Created At': s.createdAt,
+  }));
+  const salesSheet = XLSX.utils.json_to_sheet(salesData);
+  XLSX.utils.book_append_sheet(wb, salesSheet, 'Sales');
+
+    // 3. Quotations Sheet
+  const quotationsData = quotations.map((q) => ({
+    'Quotation No': q.quotationNumber,
+    'Customer Name': q.customerName,
+    Date: q.quotationDate,
+    'Valid Until': q.validUntil,
+    'Subtotal (INR)': q.subtotal,
+    'Discount (INR)': q.discount,
+    'Tax %': q.taxPercentage,
+    'Total Amount (INR)': q.total,
+    Status: q.status,
+    Notes: q.notes || '',
+  }));
+  const quotationsSheet = XLSX.utils.json_to_sheet(quotationsData);
+  XLSX.utils.book_append_sheet(wb, quotationsSheet, 'Quotations');
+
+    // 4. Invoices Sheet
+  const invoicesData = invoices.map((inv) => ({
+    'Invoice No': inv.invoiceNumber,
+    'Customer Name': inv.customerName,
+    'Invoice Date': inv.invoiceDate,
+    'Due Date': inv.dueDate,
+    'Subtotal (INR)': inv.subtotal,
+    'Tax Amount (INR)': inv.tax,
+    'Total Amount (INR)': inv.total,
+    Status: inv.status,
+    'Payment Mode': inv.paymentMode || '',
+    'Paid Date': inv.paidDate || '',
+    Notes: inv.notes || '',
+  }));
+  const invoicesSheet = XLSX.utils.json_to_sheet(invoicesData);
+  XLSX.utils.book_append_sheet(wb, invoicesSheet, 'Invoices');
+
+    // 5. Projects Sheet
+  const projectsData = projects.map((p) => ({
+    ID: p.id,
+    Title: p.title,
+    'Customer Name': p.customerName,
+    Service: p.service,
+    Status: p.status,
+    'Value (INR)': p.value,
+    'Start Date': p.startDate,
+    'Due Date': p.dueDate,
+    'Progress %': p.progress,
+  }));
+  const projectsSheet = XLSX.utils.json_to_sheet(projectsData);
+  XLSX.utils.book_append_sheet(wb, projectsSheet, 'Projects');
+
+    // 6. Follow-ups Sheet
+  const followUpsData = followUps.map((f) => ({
+    ID: f.id,
+    'Customer Name': f.customerName,
+    Date: f.date,
+    Time: f.time,
+    Note: f.note,
+    Status: f.status,
+    Type: f.type,
+  }));
+  const followUpsSheet = XLSX.utils.json_to_sheet(followUpsData);
+  XLSX.utils.book_append_sheet(wb, followUpsSheet, 'Follow-ups');
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, `crm_backup_${dateStr}.xlsx`);
+};
   useEffect(() => {
     if (!('Notification' in window)) {
       setNotificationStatus('unsupported');
@@ -350,6 +456,14 @@ function SettingsView() {
                   <Download />
 
                   <span>Download JSON Backup</span>
+                </button>
+                <button
+                  type='button'
+                  className='btn-download-excel'
+                  onClick={handleExportExcel}
+                >
+                  <FileSpreadsheet />
+                  <span>Download Excel (.xlsx)</span>
                 </button>
               </div>
             </div>

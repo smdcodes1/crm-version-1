@@ -52,9 +52,27 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
     font-family: inherit;
 }
-
+.sfm-text-area {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 80px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #1f2937;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-family: inherit;
+}
 .sfm-input:focus,
 .sfm-select:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 1px #7c3aed;
+}
+.sfm-text-area:focus {
     border-color: #7c3aed;
     box-shadow: 0 0 0 1px #7c3aed;
 }

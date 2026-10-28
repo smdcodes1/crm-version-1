@@ -193,7 +193,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
             </table>
           </div> */}
           <label className='idm-quotation-details' style={{marginBottom:0}}>
-            2. Inherited Quotation Details 
+            1. Inherited Quotation Details 
           </label>
           <div className="idm-inherited-box">
             <div className="idm-inherited-header">
@@ -260,7 +260,7 @@ function InvoiceDetailModal({ isOpen, onClose, invoice }) {
             </div>
           </div>
           <label className="idm-step-label" style={{marginBottom: 0}}>
-            3. Invoice Details
+            2. Invoice Details
           </label>
           <div className='idm-inherited-box'>
             <div className='idm-total-line'>

@@ -686,9 +686,10 @@ export const CRMProvider = ({ children }) => {
                 return match ? parseInt(match[1], 10) : 0;
             })
             .filter((n) => !isNaN(n));
-        const maxNum = nums.length > 0 ? Math.max(...nums) : 0;
+        const maxNum = nums.length > 0 ? Math.max(...nums) : 1000;
         const nextNum = maxNum + 1;
-        return `QT-${String(nextNum).padStart(4, '0')}`;
+        
+        return `QT-${nextNum}`;
     };
     const addQuotation = async (data) => {
         const qNum = getNextQuotationNumber();
@@ -774,9 +775,10 @@ export const CRMProvider = ({ children }) => {
                 return match ? parseInt(match[1], 10) : 0;
             })
             .filter((n) => !isNaN(n));
-        const maxNum = nums.length > 0 ? Math.max(...nums) : 0;
+        const maxNum = nums.length > 0 ? Math.max(...nums) : 1000;
         const nextNum = maxNum + 1;
-        return `INV-${String(nextNum).padStart(4, '0')}`;
+        
+        return `INV-${nextNum}`;
     };
     const generateInvoiceFromQuotation = async (
         quotationId,

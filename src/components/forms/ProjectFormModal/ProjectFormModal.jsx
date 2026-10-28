@@ -271,7 +271,7 @@ function ProjectFormModal({ isOpen, onClose, projectToEdit, defaultCustomerId })
                             id="project-value-input"
                             type="number"
                             min="0"
-                            step="1000"
+     
                             placeholder="e.g. 80000"
                             value={projectValue}
                             onChange={(e) =>

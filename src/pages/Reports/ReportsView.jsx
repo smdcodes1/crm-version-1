@@ -1,20 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import StatCard from '../../components/StatCard/StatCard';
 import {TrendingUp,Award,DollarSign,Users,Target} from "lucide-react";
 import BarChart from '../../components/BarChart/BarChart';
 import './ReportsView.css';
 import { useCRM } from '../../context/CRMContext';
 import { formatINR } from '../../utils/Formatters';
-
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+const yearOptions = ['Monthly', 'Quarterly', 'Halfly', 'Yearly'];
 const COLORS = ['#7c3aed', '#9333ea', '#a855f7', '#c084fc', '#e9d5ff', '#6366f1'];
 
 function ReportsView() {
-  const {customers, sales}= useCRM();
+  const {customers, sales, fetchSalesByDate}= useCRM();
+  const [yearFilter, setYearFilter]= useState('Monthly');
+  const [initialDate, setInitialDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate, setFinalDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
+  });
+  const [isLoading, setIsLoading]= useState(false);
+  const isWithinFilter = (dateString, filter) => {
+    if (!dateString) return false;
+    const itemDate = new Date(dateString);
+    if (isNaN(itemDate.getTime())) return false;
+
+    const now = new Date();
+    const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
+
+    switch (filter) {
+      case 'Monthly':
+        return daysDifference <= 30;
+      case 'Quarterly':
+        return daysDifference <= 90;
+      case 'Halfly':
+        return daysDifference <= 180;
+      case 'Annually':
+        return daysDifference <= 365;
+      default:
+        return true;
+    }
+  };
+  const filteredSales = sales.filter(s => isWithinFilter(s.createdAt || s.saleDate, yearFilter));
   // Metrics
-  const wonSales= sales.filter((s)=> s.status === 'Won');
+  const wonSales= filteredSales.filter((s)=> s.status === 'Won');
   const totalRevenue = wonSales.reduce((sum, s) => sum + (s.proposalValue || 0), 0);
-  const totalPipeline = sales.reduce((sum, s) => sum + (s.proposalValue || 0), 0);
-  const winRate = sales.length > 0 ? Math.round((wonSales.length / sales.length) * 100) : 0;
+  const totalPipeline = filteredSales.reduce((sum, s) => sum + (s.proposalValue || 0), 0);
+  const winRate = filteredSales.length > 0 ? Math.round((wonSales.length / filteredSales.length) * 100) : 0;
   const avgDealSize = wonSales.length > 0 ? Math.round(totalRevenue / wonSales.length) : 0;
 
   // Industry breakdown
@@ -46,7 +77,14 @@ wonSales.forEach((s) => {
   });
 const topCustomers = Object.values(customerRevenueMap).sort((a, b) => b.revenue - a.revenue);
 // const subtitle = "Accounts with highest closed deal volume";
-
+const handleSearch = async () => {
+  setIsLoading(true);
+  try {
+    await fetchSalesByDate(initialDate, finalDate);
+  } finally {
+    setIsLoading(false);
+  }
+};
   return (
     <>
       <div className='title-header'>
@@ -54,7 +92,21 @@ const topCustomers = Object.values(customerRevenueMap).sort((a, b) => b.revenue 
           <h2>Reports & Analytics</h2>
           <p>Performance metrics, revenue summary, and industry breakdown.</p>
         </div>
-        {/* <button>Add Report</button> */}
+        <div className='year-container'>
+          <select
+            className="select-filter year-select"
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+          >
+            {yearOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+          {/* <button>Add Report</button> */}
+        </div>
+        
       </div>
 
       <div className='stat-cards-wrapper'>
@@ -97,6 +149,34 @@ const topCustomers = Object.values(customerRevenueMap).sort((a, b) => b.revenue 
               // valueColor="#7c3aed"
           />
         </div>
+      </div>
+      <div className='projects-controls5'>
+
+        <div className='projects-controls5-left'>
+          <input
+            type="date"
+            required
+            value={initialDate}
+            onChange={(e) => setInitialDate(e.target.value)}
+            className="projects-controls5-input"
+          />
+          <input
+            type="date"
+            required
+            value={finalDate}
+            onChange={(e) => setFinalDate(e.target.value)}
+            className="projects-controls5-input"
+          />
+        </div>
+         <button
+          type='button'
+          disabled={isLoading}
+          className='search-button-right'
+          onClick={handleSearch}
+        >
+          {isLoading ? 'Searching..' : "Search"}
+          {isLoading && <LoadingIndicator />}
+        </button>
       </div>
       <div className='reports-bottom-wrapper'>
         <div className='reports-chart-wrapper'>
