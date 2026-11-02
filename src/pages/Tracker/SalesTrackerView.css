@@ -181,20 +181,27 @@
 .tracker-table-responsive {
     width: 100%;
     overflow-x: hidden;
-    overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
 .tracker-table-responsive::-webkit-scrollbar{
-  display: none;
+  /* display: none; */
   width: 0;
-  height: 0;
+  height: 6px;
+}
+.tracker-table-responsive::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+.tracker-table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
 }
 
 .pipeline-table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    min-width: 1080px;
+    min-width: 800px;
 }
 
 .pipeline-table th {
@@ -290,6 +297,20 @@
     font-size: 13px;
     color: #475569;
 }
+
+.table-title-btn {
+    text-align: left;
+    font-weight: 600;
+    color: #1a202c;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+.table-title-btn:hover {
+    color: #7c3aed;
+    /* text-decoration: underline; */
+}
+
 /* Actions Column */
 .actions-cell {
     display: flex;
@@ -326,6 +347,17 @@
 }
 .action-icon-btn2:hover {
     color: #b90e0a;
+}
+.action-icon-btn3 {
+    padding: 4px;
+    color: #9ca3af;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.action-icon-btn3:hover {
+    color: #475569;
 }
 
 .empty-row {
@@ -422,6 +454,24 @@
 .search-button-right:hover {
   background-color: #6d28d9;
 }
+.export-csv-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    color: #3f3f46;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.export-csv-btn:hover {
+    background-color: #f9fafb;
+}
 
 @media (max-width: 1024px) {
     .stat-cards-grid {
@@ -433,10 +483,10 @@
         padding: 16px;
     }
     .pipeline-wrapper {
-        max-width: 876px;
+        max-width: 880px;
     }
     .projects-controls4 {
-        max-width: 876px;
+        max-width: 880px;
         padding: 12px 16px;
         margin-left: 14px;
     }
@@ -450,7 +500,8 @@
 
     .pipeline-wrapper {
         padding: 16px;
-        max-width: 706px;
+        width: calc(100% - 32px);
+        margin: 0 16px;
     }
 
     .pipeline-header {
@@ -474,20 +525,35 @@
     }
     .projects-controls4{
         max-width: 706px;
-        margin-left: 15px;
+        margin: 0 16px 20px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .projects-controls4-left {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
     }
     .projects-controls4-input {
-        width: 200px;
+        width: 100%;
         padding: 6px 10px;
         font-size: 0.77rem;
     }
     .search-button-right{
+        width: 100%;
         font-size: 12px;
         padding: 8px 18px;
     }
     .year-container{
         flex-wrap: nowrap;
         gap: 6px;
+    }
+    .title-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px;
+        padding: 16px;
     }
 }
 

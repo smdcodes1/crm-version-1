@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import StatCard from '../../components/StatCard/StatCard';
+import StatCard, { ViewIcon } from '../../components/StatCard/StatCard';
 import Swal from 'sweetalert2';
-import { TrendingUp, UserCheck, Trophy, XCircle, Plus, Search, Calendar, Bell, Edit2, Trash2, FileText, Clock, CheckCircle2, Filter } from "lucide-react";
+import { TrendingUp, UserCheck, Trophy, XCircle, Plus, Search, Calendar, Bell, Edit2, Trash2, FileText, Clock, CheckCircle2, Filter, Eye } from "lucide-react";
 import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
 import "./SalesTrackerView.css";
 import { useCRM } from '../../context/CRMContext';
@@ -9,7 +9,8 @@ import { formatDate, formatINR, getRelativeDay } from '../../utils/Formatters';
 import SaleFormModal from '../../components/forms/SaleFormModal/SaleFormModal';
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
 import { SearchIcon, EditIcon, TrashIcon } from '../../components/StatCard/StatCard';
-
+import SaleDetailModal from '../../components/modals/SaleDetailModal/SaleDetailModal';
+import CreateQuotationModal from '../../components/forms/CreateQuotationModal/CreateQuotationModal';
 // const BellIcon= ()=> (
 //   <svg
 //     xmlns="http://www.w3.org/2000/svg"
@@ -35,6 +36,7 @@ function SalesTrackerView() {
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [industryFilter, setIndustryFilter] = useState('All Industries');
   const [editingSale, setEditingSale] = useState(null);
+  const [viewingSale, setViewingSale]= useState(null);
   const [yearFilter, setYearFilter] = useState('Monthly');
   const [initialDate, setInitialDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [finalDate, setFinalDate] = useState(() => {
@@ -42,8 +44,8 @@ function SalesTrackerView() {
     d.setDate(d.getDate() + 30);
     return d.toISOString().split('T')[0];
   });
-  const { isAddSaleOpen, setIsAddSaleOpen, deleteSale, sales, deleteFollowUp, fetchSalesByDate } = useCRM();
-  const statusOptions = ['All Statuses', 'Following', 'Negotiation', 'Won', 'Lost'];
+  const { isAddSaleOpen, setIsAddSaleOpen, deleteSale, sales, deleteFollowUp, fetchSalesByDate, isCreateQuotationOpen, setIsCreateQuotationOpen } = useCRM();
+  const statusOptions = ['All Statuses', 'Following', 'Negotiation', 'Won', 'Lost', 'Proposal Sent'];
   const isWithinFilter = (dateString, filter) => {
     if (!dateString) return false;
     const itemDate = new Date(dateString);
@@ -100,7 +102,14 @@ function SalesTrackerView() {
 
       return matchesStatus && matchesIndustry && matchesSearch && matchesDate;
     });
-  }, [sales, searchQuery, statusFilter, industryFilter]);
+  }, [sales, searchQuery, statusFilter, industryFilter])
+  .sort((a, b) => {
+    const nameA = (a.customerName || '').toLowerCase();
+    const nameB = (b.customerName || '').toLowerCase();
+    
+    // Ascending alphabetical order (A to Z)
+    return nameA.localeCompare(nameB);
+  }); 
   // const filteredSales = sales.filter((s) => {
   //   const matchesSearch =
   //     s.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -172,6 +181,80 @@ function SalesTrackerView() {
     } finally {
       setIsLoading(false);
     }
+  };
+  const handleExportCSV = () => {
+    if (filteredSales.length === 0) return;
+
+    const headers = [
+      'Customer Name',
+      'Contact Number',
+      'Service',
+      'Industry',
+      'Proposal Shared',
+      'Proposal Value',
+      'Status',
+      'Remarks',
+      'Sale Date',
+      'Reminder',
+      'Created Date',
+    ];
+
+    const escapeCSV = (value) => {
+      if (value === undefined || value === null) return '""';
+      const str = String(value).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+    const formatReminder = (reminder) => {
+      if (!reminder) return '';
+      
+      // Handle if it's stored as a JSON string or an object
+      let rem = reminder;
+      if (typeof reminder === 'string') {
+        try {
+          rem = JSON.parse(reminder);
+        } catch (e) {
+          return reminder;
+        }
+      }
+
+      if (typeof rem !== 'object') return String(rem);
+
+      const parts = [];
+      if (rem.date) parts.push(`Date: ${rem.date}`);
+      if (rem.time) parts.push(`Time: ${rem.time}`);
+      
+      const statusLabel = rem.completed ? 'Completed' : rem.enabled ? 'Active' : 'Disabled';
+      parts.push(`Status: ${statusLabel}`);
+      
+      if (rem.note) parts.push(`Note: ${rem.note}`);
+
+      return parts.join(' | ');
+    };
+    const rows = filteredSales.map((c) => [
+      escapeCSV(c.customerName),
+      escapeCSV(c.contactNumber),
+      escapeCSV(c.service),
+      escapeCSV(c.industry),
+      escapeCSV(c.proposalShared),
+      escapeCSV(c.proposalValue || 0),
+      escapeCSV(c.status),
+      escapeCSV(c.remarks || ""),
+      escapeCSV(formatDate(c.saleDate)),
+      escapeCSV(formatReminder(c.reminder || {})),
+      escapeCSV(c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-GB') : ''),
+    ]);
+
+    const csvContent = [headers.map((h) => `"${h}"`).join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.href = url;
+    link.setAttribute('download', `customers-export-${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
   return (
     <>
@@ -284,6 +367,15 @@ function SalesTrackerView() {
           <div className="title-group">
             <h2>Sales Pipeline</h2>
             {/* <span className="count-badge">{filteredSales.length}</span> */}
+            <button
+              id='export-sales-csv-btn'
+              title='Export current sales table to CSV'
+              className='export-csv-btn'
+              disabled={filteredSales.length === 0}
+              onClick={handleExportCSV}
+            >
+              Export CSV
+            </button>
           </div>
 
           <div className="filter-controls">
@@ -354,7 +446,14 @@ function SalesTrackerView() {
                   <tr key={item.id}>
                     {/* Company */}
                     <td>
-                      <div className="company-cell">{item.customerName}</div>
+                      {/* <div className="company-cell">{item.customerName}</div> */}
+                      <button
+                        title='Click to view details'
+                        className='table-title-btn'
+                        onClick={()=> setViewingSale(item)}
+                      >
+                        {item.customerName}
+                      </button>
                       {item.reminder?.enabled ? (
                         <button
                           type='button'
@@ -412,6 +511,14 @@ function SalesTrackerView() {
                     {/* Actions */}
                     <td>
                       <div className="actions-cell">
+                        <button
+                          id= {`view-sale-${item.id}`}
+                          onClick={()=> setViewingSale(item)}
+                          title= "View Sale Details"
+                          className='action-icon-btn3'
+                        >
+                          <ViewIcon />
+                        </button> 
                         <button type="button" className="action-icon-btn1" title="Edit" onClick={() => {
                           setEditingSale(item);
                           setIsAddSaleOpen(true);
@@ -436,6 +543,16 @@ function SalesTrackerView() {
         </div>
       </div>
 
+      <SaleDetailModal
+        isOpen={!!viewingSale}
+        onClose={()=> setViewingSale(null)}
+        sale={viewingSale}
+        onEdit={(sale) => {
+          setViewingSale(null);
+          setEditingSale(sale);
+          setIsAddSaleOpen(true);
+        }}
+      />
       <SaleFormModal
         isOpen={isAddSaleOpen}
         onClose={() => {
@@ -443,6 +560,10 @@ function SalesTrackerView() {
           setEditingSale(null);
         }}
         saleToEdit={editingSale}
+      />
+      <CreateQuotationModal
+        isOpen={isCreateQuotationOpen}
+        onClose={()=> setIsCreateQuotationOpen(false)}
       />
     </>
   );

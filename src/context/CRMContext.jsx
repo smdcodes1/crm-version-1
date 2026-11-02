@@ -688,7 +688,7 @@ export const CRMProvider = ({ children }) => {
             .filter((n) => !isNaN(n));
         const maxNum = nums.length > 0 ? Math.max(...nums) : 1000;
         const nextNum = maxNum + 1;
-        
+
         return `QT-${nextNum}`;
     };
     const addQuotation = async (data) => {
@@ -777,7 +777,7 @@ export const CRMProvider = ({ children }) => {
             .filter((n) => !isNaN(n));
         const maxNum = nums.length > 0 ? Math.max(...nums) : 1000;
         const nextNum = maxNum + 1;
-        
+
         return `INV-${nextNum}`;
     };
     const generateInvoiceFromQuotation = async (
@@ -815,7 +815,7 @@ export const CRMProvider = ({ children }) => {
             })),
             subtotal: subtotal || quotation.subtotal || '',
             taxPercentage: quotation.taxPercentage || 18,
-            tax: tax || quotation.tax || '',
+            tax: (tax !== undefined && tax !== '') ? tax : (quotation.tax || 0),
             total: total || quotation.total || '',
             paymentStatus: 'Unpaid',
             notes: notes || quotation.notes || '',
@@ -965,12 +965,24 @@ export const CRMProvider = ({ children }) => {
     // Follow-ups handlers
     const toggleFollowUpComplete = async (id) => {
         const followUp = followUps.find((f) => f.id === id || f.saleId === id);
-        const actualId = followUp ? followUp.id : id;
-        const saleId = followUp ? followUp.saleId : id;
-        const newCompletedStatus = followUp ? !followUp.completed : true;
+        const actualFollowUpId = followUp ? followUp.id : id;
+        const targetSaleId = followUp ? followUp.saleId : id;
+        const sale = sales.find((s) => s.id === targetSaleId || s.id === id);
+        const newCompletedStatus = followUp
+            ? !followUp.completed
+            : (sale?.reminder ? !sale.reminder.completed : true);
+        const newEnabledStatus = sale?.reminder ? !sale.reminder.enabled : false;
 
         setFollowUps((prev) =>
-            prev.map((f) => (f.id === actualId || f.saleId === saleId ? { ...f, completed: newCompletedStatus } : f))
+            prev.map((f) => (f.id === actualFollowUpId || f.saleId === targetSaleId ? { ...f, completed: newCompletedStatus } : f))
+        );
+        setSales((prev) =>
+            prev.map((s) => {
+                if ((s.id === targetSaleId || s.id === id) && s.reminder) {
+                    return { ...s, reminder: { ...s.reminder, completed: newCompletedStatus, enabled: newEnabledStatus } };
+                }
+                return s;
+            })
         );
 
         const { data: { user } } = await supabase.auth.getUser();
@@ -979,19 +991,20 @@ export const CRMProvider = ({ children }) => {
             const { error: editError } = await supabase
                 .from('follow_ups')
                 .update({ completed: newCompletedStatus })
-                .eq('id', actualId)
+                .eq('id', actualFollowUpId)
                 .eq('user_id', user.id);
 
             if (editError) console.error('Error updating follow_up:', editError.message);
-            const reminderPayload = followUp && followUp.reminder ? { ...followUp.reminder, completed: newCompletedStatus } : null;
 
-            const { error: updateError } = await supabase
-                .from('sales')
-                .update({ reminder: reminderPayload })
-                .eq('id', saleId)
-                .eq('user_id', user.id);
-
-            if (updateError) console.error('Error updating sales reminder:', updateError.message);
+            if (sale && sale.reminder) {
+                const reminderPayload = { ...sale.reminder, completed: newCompletedStatus, enabled: newEnabledStatus };
+                const { error: updateError } = await supabase
+                    .from('sales')
+                    .update({ reminder: reminderPayload })
+                    .eq('id', targetSaleId)
+                    .eq('user_id', user.id);
+                if (updateError) console.error('Error updating sales reminder:', updateError.message);
+            }
         }
 
     };
@@ -1006,7 +1019,8 @@ export const CRMProvider = ({ children }) => {
 
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-            const { error: deleteError } = await supabase.from('follow_ups').update({ completed: newCompletedStatus }).eq('sale_id', id).eq('user_id', user.id);
+            // const { error: deleteError } = await supabase.from('follow_ups').update({ completed: newCompletedStatus }).eq('sale_id', id).eq('user_id', user.id);
+            const { error: deleteError } = await supabase.from('follow_ups').delete().eq('sale_id', id).eq('user_id', user.id);
             if (deleteError) console.error('Error deleting follow_up:', deleteError.message);
 
             const { error: updateError } = await supabase

@@ -240,12 +240,19 @@
 
 .trc-table-wrapper {
     width: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 .trc-table-wrapper::-webkit-scrollbar{
-  display: none;
+  height: 6px;
+}
+.trc-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+.trc-table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
 }
 
 .trc-table {
@@ -253,6 +260,7 @@
     border-collapse: separate;
     border-spacing: 0;
     text-align: left;
+    min-width: 800px;
 }
 
 .trc-table thead th {
@@ -415,6 +423,24 @@
     background-color: #6d28d9;
 }
 
+.export-csv-btn { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    color: #3f3f46;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.export-csv-btn:hover {
+    background-color: #f9fafb;
+}
 /* Responsive breakpoints */
 @media (max-width: 1024px) {
      .stat-cards-grid {
@@ -427,15 +453,15 @@
     }
 
     .trc-card-container {
-        max-width: 900px;
+        max-width: 880px;
     }
     .reports-chart-wrapper {
         width: 56vw;
     }
     .projects-controls5 {
-        max-width: 910px;
+        max-width: 880px;
         padding: 12px 16px;
-        margin-left: 15px;
+        margin-left: 13px;
     }
 }
 
@@ -460,7 +486,8 @@
     .trc-card-container {
         padding: 16px;
         border-radius: 10px;
-        max-width: 725px;
+        width: calc(100% - 32px);
+        margin: 0 16px;
     }
 
     .trc-header {
@@ -493,17 +520,31 @@
         width: 100%;
     }
     .projects-controls5{
-        max-width: 722px;
-        margin-left: 18px;
+        margin: 0 16px 20px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .projects-controls5-left {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
     }
     .projects-controls5-input {
-        width: 200px;
+        width: 100%;
         padding: 6px 10px;
         font-size: 0.77rem;
     }
     .search-button-right {
+        width: 100%;
         font-size: 12px;
         padding: 8px 18px;
+    }
+    .title-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px;
+        padding: 16px;
     }
 }
 
@@ -522,19 +563,6 @@
     }
     .year-select {
         min-width: 90px !important;
-    }
-    .projects-controls5{
-        max-width: 444px;
-        margin-left: 14px;
-    }
-    .projects-controls5-input {
-        width: 100px;
-        padding: 5px 7px;
-        font-size: 0.66rem;
-    }
-   
-    .trc-card-container {
-        max-width: 444px;
     }
 }
 

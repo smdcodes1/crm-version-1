@@ -19,7 +19,21 @@ const PlusIcon = () => (
         <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
 );
-
+const serviceList = [
+    'Website Development',
+    'Social Media Management',
+    'Ads Management',
+    'Video Production',
+    'Poster design',
+    'Letter head',
+    'Visiting Card',
+    'SEO',
+    'Training session',
+    'GMB Services',
+    'Brochure design',
+    'Branding',
+    'Others'
+];
 function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustomerId }) {
     const { customers, quotations, getNextQuotationNumber, addQuotation, updateQuotation } = useCRM();
     const [customerId, setCustomerId] = useState('');
@@ -60,6 +74,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
             setNotes(quotationToEdit.notes || '');
             setDiscount(quotationToEdit.discount ?? 0);
             setTaxPercentage(quotationToEdit.taxPercentage ?? 18);
+            setIncludeTax(Number(quotationToEdit.tax) > 0);
             setItems(quotationToEdit.items && quotationToEdit.items.length > 0 ? quotationToEdit.items : [
                 {
                     id: `qi-${Date.now()}`,
@@ -80,6 +95,7 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
             setDiscount(0);
             setTaxPercentage(18);
             setNotes('');
+            setIncludeTax(false);
 
             if (defaultCustomerId) {
                 const found = customers.find((c) => c.id === defaultCustomerId);
@@ -212,18 +228,30 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                             Customer / Company <span className="cqm-required">*</span>
                         </label>
                         {customers.length > 0 ? (
-                            <select
-                                id="quote-customer-select"
-                                value={customerId}
-                                onChange={(e) => handleCustomerChange(e.target.value)}
-                                className="cqm-select"
-                            >
-                                {customers.map((c) => (
-                                    <option key={c.id} value={c.id}>
-                                        {c.companyName} ({c.contactPerson})
-                                    </option>
-                                ))}
-                            </select>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <select
+                                    id="quote-customer-select"
+                                    value={customerId}
+                                    onChange={(e) => handleCustomerChange(e.target.value)}
+                                    className="cqm-select"
+                                >
+                                    <option value="" >Select Existing or Custom..</option>
+                                    {customers.map((c) => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.companyName} ({c.contactPerson})
+                                        </option>
+                                    ))}
+                                </select>
+                                {!customerId && (
+                                    <input
+                                        type='text'
+                                        placeholder='Or Company Name'
+                                        value={customerName}
+                                        onChange={(e) => setCustomerName(e.target.value)}
+                                        className='cqm-input'
+                                    />
+                                )}
+                            </div>
                         ) : (
                             <input
                                 type="text"
@@ -320,14 +348,28 @@ function CreateQuotationModal({ isOpen, onClose, quotationToEdit, defaultCustome
                                 {items.map((item) => (
                                     <tr key={item.id}>
                                         <td>
-                                            <input
+                                            {/* <input
                                                 type="text"
                                                 required
                                                 placeholder="e.g. Website Development"
                                                 value={item.service}
                                                 onChange={(e) => handleItemChange(item.id, 'service', e.target.value)}
                                                 className="cqm-table-input"
-                                            />
+                                            /> */}
+                                            <select
+                                                id="services"
+                                                value={item.service}
+                                                onChange={(e) => handleItemChange(item.id, 'service', e.target.value)}
+                                                required
+                                                className='select-service-filter service-select'
+                                            >
+                                                <option value="" disabled>Select an option</option>
+                                                {serviceList.map((service, index) => (
+                                                    <option key={index} value={service}>
+                                                        {service}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </td>
                                         <td className="cqm-cell-hide-sm">
                                             <input

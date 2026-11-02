@@ -1,21 +1,21 @@
 import React, { useState, useMemo } from 'react';
 import "./CustomersView.css";
 import Swal from 'sweetalert2';
-import {Users,UserCheck,Trophy,XCircle,Plus,Search,Eye,Edit2,Trash2,Phone,Mail,Building,Filter} from "lucide-react";
+import { Users, UserCheck, Trophy, XCircle, Plus, Search, Eye, Edit2, Trash2, Phone, Mail, Building, Filter } from "lucide-react";
 import StatCard, { EditIcon, SearchIcon, TrashIcon, ViewIcon } from '../../components/StatCard/StatCard';
 import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
 import { useCRM } from '../../context/CRMContext';
 import CustomerDetailModal from '../../components/modals/CustomerDetailModal/CustomerDetailModal';
 import CustomerFormModal from "../../components/forms/CustomerFormModal/CustomerFormModal";
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
-const PhoneIcon= ()=> (
+const PhoneIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
   </svg>
 );
-const yearOptions= ['Monthly', 'Quarterly', 'Halfly', 'Annually'];
+const yearOptions = ['Monthly', 'Quarterly', 'Halfly', 'Annually'];
 function CustomersView() {
-  const [isLoading, setIsLoading]= useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   // const [customers, setCustomers] = useState(INITIAL_CUSTOMERS);
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
@@ -23,12 +23,12 @@ function CustomersView() {
   const [editingCustomer, setEditingCustomer] = useState(null);
   const filterTabs = ['All', 'Following', 'Won', 'Lost'];
   const { customers, deleteCustomer, isAddCustomerOpen, setIsAddCustomerOpen, fetchCustomersByDate } = useCRM();
-  const [yearFilter, setYearFilter]= useState('Monthly');
-  const [initialDate, setInitialDate]= useState(() => new Date().toISOString().split('T')[0]);
-  const [finalDate, setFinalDate]= useState(() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 30);
-      return d.toISOString().split('T')[0];
+  const [yearFilter, setYearFilter] = useState('Monthly');
+  const [initialDate, setInitialDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [finalDate, setFinalDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
   });
   const isWithinFilter = (dateString, filter) => {
     if (!dateString) return false;
@@ -39,16 +39,16 @@ function CustomersView() {
     const daysDifference = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
 
     switch (filter) {
-        case 'Monthly':
-            return daysDifference <= 30;
-        case 'Quarterly':
-            return daysDifference <= 90;
-        case 'Halfly':
-            return daysDifference <= 180;
-        case 'Annually':
-            return daysDifference <= 365;
-        default:
-            return true;
+      case 'Monthly':
+        return daysDifference <= 30;
+      case 'Quarterly':
+        return daysDifference <= 90;
+      case 'Halfly':
+        return daysDifference <= 180;
+      case 'Annually':
+        return daysDifference <= 365;
+      default:
+        return true;
     }
   };
   const filteredCustomersHeader = customers.filter(c => isWithinFilter(c.createdAt, yearFilter));
@@ -58,7 +58,7 @@ function CustomersView() {
   const wonCount = filteredCustomersHeader.filter((c) => c.status === 'Won').length;
   const lostCount = filteredCustomersHeader.filter((c) => c.status === 'Lost').length;
   // filter list 
- 
+
   const filteredCustomers = customers.filter((cust) => {
     const matchesSearch =
       cust.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -71,7 +71,14 @@ function CustomersView() {
     const matchesDate = isWithinFilter(cust.createdAt, yearFilter);
 
     return matchesSearch && matchesStatus && matchesDate;
-  });
+  })
+    .sort((a, b) => {
+      const nameA = (a.companyName || '').toLowerCase();
+      const nameB = (b.companyName || '').toLowerCase();
+
+      // Ascending alphabetical order (A to Z)
+      return nameA.localeCompare(nameB);
+    });
 
   const handleDelete = async (id, name) => {
     const result = await Swal.fire({
@@ -106,13 +113,66 @@ function CustomersView() {
       }
     }
   };
-  const handleSearch= async ()=> {
+  const handleSearch = async () => {
     setIsLoading(true);
-  try {
-    await fetchCustomersByDate(initialDate,finalDate);
-  } finally {
-    setIsLoading(false);
-  }
+    try {
+      await fetchCustomersByDate(initialDate, finalDate);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleExportCSV = () => {
+    if (filteredCustomers.length === 0) return;
+
+    const headers = [
+      'Company Name',
+      'Contact Person',
+      'Phone',
+      'Email',
+      'WhatsApp',
+      'Industry',
+      'Status',
+      'City',
+      'State',
+      'Address',
+      'Website',
+      'Notes',
+      'Created Date',
+    ];
+
+    const escapeCSV = (value) => {
+      if (value === undefined || value === null) return '""';
+      const str = String(value).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = filteredCustomers.map((c) => [
+      escapeCSV(c.companyName),
+      escapeCSV(c.contactPerson),
+      escapeCSV(c.phone),
+      escapeCSV(c.email),
+      escapeCSV(c.whatsapp || ''),
+      escapeCSV(c.industry),
+      escapeCSV(c.status),
+      escapeCSV(c.city || ''),
+      escapeCSV(c.state || ''),
+      escapeCSV(c.address || ''),
+      escapeCSV(c.website || ''),
+      escapeCSV(c.notes || ''),
+      escapeCSV(c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-GB') : ''),
+    ]);
+
+    const csvContent = [headers.map((h) => `"${h}"`).join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.href = url;
+    link.setAttribute('download', `customers-export-${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
   return (
     <>
@@ -121,29 +181,29 @@ function CustomersView() {
           <h2>Customers</h2>
           <p>Manage your customer relationships.</p>
         </div>
-         <div className='year-container'>
-            <select
-                className="select-filter year-select"
-                value={yearFilter}
-                onChange={(e) => setYearFilter(e.target.value)}
-            >
-                {yearOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                        {opt}
-                    </option>
-                ))}
-            </select>
-            <button onClick={()=> {
-              setEditingCustomer(null);
-              setIsAddCustomerOpen(true);
-            }}>Add Customer</button>
+        <div className='year-container'>
+          <select
+            className="select-filter year-select"
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+          >
+            {yearOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+          <button onClick={() => {
+            setEditingCustomer(null);
+            setIsAddCustomerOpen(true);
+          }}>Add Customer</button>
 
-          </div>
-        
+        </div>
+
       </div>
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-        
+
           <StatCard
             // key={index}
             title="Total Customers"
@@ -151,7 +211,7 @@ function CustomersView() {
             subtitle="Directory accounts"
             icon={<Users />}
             colorScheme="purple"
-       
+
           />
           <StatCard
             // key={index}
@@ -160,7 +220,7 @@ function CustomersView() {
             subtitle="Ongoing dialogues"
             icon={<UserCheck />}
             colorScheme="blue"
-        
+
           />
           <StatCard
             // key={index}
@@ -185,27 +245,27 @@ function CustomersView() {
       <div className='projects-controls1'>
         <div className='projects-controls1-left'>
           <input
-              type="date"
-              required
-              value={initialDate}
-              onChange={(e) => setInitialDate(e.target.value)}
-              className="projects-controls1-input"
+            type="date"
+            required
+            value={initialDate}
+            onChange={(e) => setInitialDate(e.target.value)}
+            className="projects-controls1-input"
           />
           <input
-              type="date"
-              required
-              value={finalDate}
-              onChange={(e) => setFinalDate(e.target.value)}
-              className="projects-controls1-input"
+            type="date"
+            required
+            value={finalDate}
+            onChange={(e) => setFinalDate(e.target.value)}
+            className="projects-controls1-input"
           />
         </div>
-        <button 
+        <button
           type='button'
-          className='search-button-right' 
+          className='search-button-right'
           onClick={handleSearch}
           disabled={isLoading}
         >
-          
+
           {isLoading ? 'Searching..' : 'Search'}
           {isLoading && <LoadingIndicator />}
         </button>
@@ -216,13 +276,22 @@ function CustomersView() {
           <div className="title-group">
             <h2>All Customers</h2>
             {/* <span className="count-badge">{filteredCustomers.length}</span> */}
+            <button
+              id='export-customers-csv-btn'
+              title='Export current customers table to CSV'
+              className='export-csv-btn'
+              disabled={filteredCustomers.length === 0}
+              onClick={handleExportCSV}
+            >
+              Export CSV
+            </button>
           </div>
 
           <div className="actions-group">
             <div className="search-box">
               <span className="search-icon">
                 <SearchIcon />
-   
+
               </span>
               <input
                 type="text"
@@ -271,7 +340,6 @@ function CustomersView() {
               ) : (
                 filteredCustomers.map((cust) => (
                   <tr key={cust.id}>
-                    {/* Company */}
                     <td>
                       <div className="company-cell">
                         <div className="company-avatar">{cust.companyName.charAt(0)}</div>
@@ -281,49 +349,40 @@ function CustomersView() {
                         </div>
                       </div>
                     </td>
-
-                    {/* Contact */}
                     <td>
                       <div className="contact-cell">
                         <span className="contact-name">{cust.contactPerson}</span>
                         {cust.email && (<span className="contact-email">{cust.email}</span>)}
                       </div>
                     </td>
-
-                    {/* Phone */}
                     <td>
                       <div className="phone-cell">
                         <span className="phone-icon">
-                         <PhoneIcon />
-                            {/* <Phone/> */}
+                          <PhoneIcon />
+
                         </span>
                         <span>{cust.phone}</span>
                       </div>
                     </td>
-
-                    {/* Industry */}
                     <td>
                       <div className="industry-cell">{cust.industry}</div>
                     </td>
-
-                    {/* Status via StatusBadge */}
                     <td>
                       <StatusBadge status={cust.status} size="md" />
                     </td>
-
-                    {/* Actions */}
                     <td>
                       <div className="actions-cell">
                         <button type="button" className="action-view" title="View details" onClick={() => setViewingCustomer(cust)}>
                           <ViewIcon />
-                    
+
                           <span>View</span>
                         </button>
-                        <button type="button" className="action-icon-btn1" title="Edit" onClick={() => { 
-                          setEditingCustomer(cust); 
-                          setIsAddCustomerOpen(true); }}>
-                         <EditIcon />
-                   
+                        <button type="button" className="action-icon-btn1" title="Edit" onClick={() => {
+                          setEditingCustomer(cust);
+                          setIsAddCustomerOpen(true);
+                        }}>
+                          <EditIcon />
+
                         </button>
                         <button
                           type="button"
@@ -332,7 +391,7 @@ function CustomersView() {
                           onClick={() => handleDelete(cust.id, cust.companyName)}
                         >
                           <TrashIcon />
-                  
+
                         </button>
                       </div>
                     </td>
@@ -343,21 +402,21 @@ function CustomersView() {
           </table>
         </div>
       </div>
-      
-      <CustomerDetailModal 
+ 
+      <CustomerDetailModal
         isOpen={!!viewingCustomer}
-        onClose={()=> setViewingCustomer(null)}
+        onClose={() => setViewingCustomer(null)}
         customer={viewingCustomer}
-        onEdit={(c)=> {
-            setEditingCustomer(c);
-            setIsAddCustomerOpen(true);
+        onEdit={(c) => {
+          setEditingCustomer(c);
+          setIsAddCustomerOpen(true);
         }}
       />
-      <CustomerFormModal 
+      <CustomerFormModal
         isOpen={isAddCustomerOpen}
-        onClose={()=> {
-            setIsAddCustomerOpen(false);
-            setEditingCustomer(null);
+        onClose={() => {
+          setIsAddCustomerOpen(false);
+          setEditingCustomer(null);
         }}
         customerToEdit={editingCustomer}
       />

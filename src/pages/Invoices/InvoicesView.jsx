@@ -9,7 +9,7 @@ import { formatDate, formatINR } from '../../utils/Formatters';
 import InvoiceDetailModal from '../../components/modals/InvoiceDetailModal/InvoiceDetailModal';
 import GenerateInvoiceModal from '../../components/forms/GenerateInvoiceModal/GenerateInvoiceModal';
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
-import { SearchIcon,ViewIcon,TrashIcon } from '../../components/StatCard/StatCard';
+import { SearchIcon, ViewIcon, TrashIcon } from '../../components/StatCard/StatCard';
 const CheckCircleIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="9" />
@@ -18,7 +18,7 @@ const CheckCircleIcon = () => (
 );
 const yearOptions = ['Monthly', 'Quarterly', 'Halfly', 'Annually'];
 function InvoicesView() {
-  const [isLoading, setIsLoading]= useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   // const [invoices, setInvoices] = useState(INITIAL_INVOICES);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -56,11 +56,11 @@ function InvoicesView() {
   const filteredInvoicesHeader = invoices.filter(i => isWithinFilter(i.invoiceDate || i.createdAt, yearFilter));
   // Summary Metrics 
   const totalCount = filteredInvoicesHeader.length;
-  const totalBilled = filteredInvoicesHeader.reduce((sum, i) => sum + (i.total || 0), 0);
+  const totalBilled = filteredInvoicesHeader.reduce((sum, i) => sum + (Number(i.total) || 0), 0);
   const paidInvoices = filteredInvoicesHeader.filter((i) => i.paymentStatus === 'Paid');
   const totalCollected = filteredInvoicesHeader.reduce((sum, i) => {
-    if (i.paymentStatus === 'Paid') return sum + i.total;
-    if (i.paymentStatus === 'Partially Paid') return sum + (i.paidAmount || 0);
+    if (i.paymentStatus === 'Paid') return sum + (Number(i.total) || 0);
+    if (i.paymentStatus === 'Partially Paid') return sum + (Number(i.paidAmount) || 0);
     return sum;
   }, 0);
   const unpaidCount = filteredInvoicesHeader.filter(
@@ -75,10 +75,16 @@ function InvoicesView() {
     const matchesStatus = statusFilter === 'All' || inv.paymentStatus === statusFilter;
     const matchesDate = isWithinFilter(inv.invoiceDate || inv.createdAt, yearFilter);
     return matchesSearch && matchesStatus && matchesDate;
-  });
+  })
+    .sort((a, b) => {
+      // Descending order: newest / highest timestamp first
+      const dateA = new Date(a.createdAt || 0);
+      const dateB = new Date(b.createdAt || 0);
+      return dateB - dateA;
+    });
   // const handleDelete = (id) => {
   //   setInvoices((prev) => prev.filter((inv) => inv.id !== id));
-  // };
+  // }; 
   const handleDelete = async (id, invNum) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
@@ -126,13 +132,84 @@ function InvoicesView() {
       paidAmount: inv.total,
     });
   };
-  const handleSearch= async ()=> {
+  const handleSearch = async () => {
     setIsLoading(true);
     try {
-      await fetchInvoicesByDate(initialDate,finalDate);
+      await fetchInvoicesByDate(initialDate, finalDate);
     } finally {
       setIsLoading(false);
     }
+  };
+  const handleExportCSV = () => {
+    if (filteredInvoices.length === 0) return;
+
+    const headers = [
+      'Invoice Number',
+      'Quotation Number',
+      'Customer Name',
+      'Invoice Date',
+      'Due Date',
+      'Items',
+      'Subtotal',
+      'Tax Percentage',
+      'Tax',
+      'Total',
+      'Payment Status',
+      'Paid Amount',
+      'Notes',
+      'Created Date',
+    ];
+
+    const escapeCSV = (value) => {
+      if (value === undefined || value === null) return '""';
+      const str = String(value).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+    const formatItems = (items) => {
+      if (!Array.isArray(items) || items.length === 0) return '';
+      return items
+        .map((item) => {
+          if (typeof item === 'string') return item;
+          // Extracts common item properties dynamically (supports description/name, quantity/qty, and price/rate)
+          const total = item.total || 0;
+          const service = item.service || 'service';
+          const qty = item.quantity || 1;
+          const price = item.unitPrice || 0;
+          const description = item.description || 'Item';
+          return price !== undefined
+            ? `${service} (Qty: ${qty}, UnitPrice: ${price}, Description: ${description}, Total: ${total})`
+            : `${service} (Qty: ${qty}, Description: ${description})`;
+        })
+        .join('; '); // Use semicolon to separate multiple items inside the CSV cell safely
+    };
+    const rows = filteredInvoices.map((c) => [
+      escapeCSV(c.invoiceNumber),
+      escapeCSV(c.quotationNumber),
+      escapeCSV(c.customerName),
+      escapeCSV(formatDate(c.invoiceDate)),
+      escapeCSV(formatDate(c.dueDate)),
+      escapeCSV(formatItems(c.items || [])),
+      escapeCSV(c.subtotal || ''),
+      escapeCSV(c.taxPercentage),
+      escapeCSV(c.tax || 0),
+      escapeCSV(c.total || 0),
+      escapeCSV(c.paymentStatus),
+      escapeCSV(c.paidAmount),
+      escapeCSV(c.notes),
+      escapeCSV(c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-GB') : ''),
+    ]);
+
+    const csvContent = [headers.map((h) => `"${h}"`).join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.href = url;
+    link.setAttribute('download', `invoices-export-${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
   return (
     <>
@@ -163,7 +240,7 @@ function InvoicesView() {
 
       <div className='stat-cards-wrapper'>
         <div className="stat-cards-grid">
-         
+
           <StatCard
             // key={index}
             title="Total Invoices"
@@ -171,7 +248,7 @@ function InvoicesView() {
             subtitle="Tax invoices issued"
             icon={<Receipt />}
             colorScheme="purple"
-         
+
           />
           <StatCard
             // key={index}
@@ -219,9 +296,9 @@ function InvoicesView() {
             className="projects-controls3-input"
           />
         </div>
-        <button 
+        <button
           type='button'
-          className='search-button-right' 
+          className='search-button-right'
           onClick={handleSearch}
           disabled={isLoading}
         >
@@ -235,6 +312,15 @@ function InvoicesView() {
           <div className="title-group">
             <h2>Invoices List</h2>
             {/* <span className="count-badge">{filteredInvoices.length}</span> */}
+            <button
+              id='export-invoices-csv-btn'
+              title='Export current Invoices table to csv'
+              className='export-csv-btn'
+              disabled={filteredInvoices.length === 0}
+              onClick={handleExportCSV}
+            >
+              Export CSV
+            </button>
           </div>
 
           <div className="actions-group">

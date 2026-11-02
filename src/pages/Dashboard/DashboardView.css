@@ -457,7 +457,12 @@
         flex-wrap: nowrap;
         gap: 6px;
     }
-  
+    .title-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px;
+        padding: 16px;
+    }
 }
 
 @media (max-width: 480px) {

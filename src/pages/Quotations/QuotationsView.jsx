@@ -68,6 +68,12 @@ function QuotationsView() {
     const matchesDate = isWithinFilter(item.quotationDate || item.createdAt, yearFilter);
 
     return matchesSearch && matchesStatus && matchesDate;
+  })
+  .sort((a, b) => {
+    // Descending order: newest / highest timestamp first
+    const dateA = new Date(a.createdAt || 0);
+    const dateB = new Date(b.createdAt || 0);
+    return dateB - dateA; 
   });
   // const handleDelete = (id) => {
   //   setQuotations((prev) => prev.filter((q) => q.id !== id));
@@ -112,7 +118,58 @@ function QuotationsView() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+  const handleExportCSV = () => {
+    if (filteredQuotations.length === 0) return;
+
+    const escapeCSV = (val) => {
+      if (val === undefined || val === null) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const headers = [
+      'Quotation Number',
+      'Customer Name',
+      'Quotation Date',
+      'Valid Until',
+      'Items Count',
+      'Subtotal (INR)',
+      'Discount (INR)',
+      'Tax (%)',
+      'Tax Amount (INR)',
+      'Total Amount (INR)',
+      'Status',
+      'Notes',
+    ];
+
+    const rows = filteredQuotations.map((q) => [
+      escapeCSV(q.quotationNumber),
+      escapeCSV(q.customerName),
+      escapeCSV(formatDate(q.quotationDate)),
+      escapeCSV(formatDate(q.validUntil)),
+      escapeCSV(q.items?.length || 0),
+      escapeCSV(q.subtotal ?? 0),
+      escapeCSV(q.discount ?? 0),
+      escapeCSV(q.taxPercentage ?? 0),
+      escapeCSV(q.taxAmount ?? 0),
+      escapeCSV(q.total ?? 0),
+      escapeCSV(q.status),
+      escapeCSV(q.notes || ''),
+    ]);
+
+    const csvContent = [headers.map((h) => `"${h}"`).join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.href = url;
+    link.setAttribute('download', `quotations-export-${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
   return (
     <>
       <div className='title-header'>
@@ -214,6 +271,15 @@ function QuotationsView() {
           <div className="title-group">
             <h2>All Quotations</h2>
             {/* <span className="count-badge">{filteredQuotations.length}</span> */}
+            <button 
+            id='export-quotations-csv-btn'
+            title='Export current quotations table to csv'
+            className='export-csv-btn'
+            disabled= {filteredQuotations.length === 0}
+            onClick={handleExportCSV}
+            >
+              Export CSV
+            </button>
           </div>
 
           <div className="actions-group">
@@ -271,7 +337,7 @@ function QuotationsView() {
                   const isAlreadyInvoiced = invoices?.some((i) => i.quotationId === item.id);
                   return (
                     <tr key={item.id}>
-                      {/* Quotation No */}
+                
                       <td>
                         <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setViewingQuotation(item)}>
                           <span className="quotation-no">{item.quotationNumber}</span>
@@ -279,7 +345,7 @@ function QuotationsView() {
 
                       </td>
 
-                      {/* Company */}
+            
                       <td>
                         <div className="company-cell">
                           <span className="company-name">{item.customerName}</span>
@@ -289,27 +355,27 @@ function QuotationsView() {
                         </div>
                       </td>
 
-                      {/* Date */}
+        
                       <td>
                         <span className="date-cell">{formatDate(item.quotationDate)}</span>
                       </td>
 
-                      {/* Valid Until */}
+      
                       <td>
                         <span className="valid-cell">{formatDate(item.validUntil)}</span>
                       </td>
 
-                      {/* Amount */}
+  
                       <td>
                         <span className="amount-cell">{formatINR(item.total)}</span>
                       </td>
 
-                      {/* Status via StatusBadge */}
+              
                       <td>
                         <StatusBadge status={item.status} size="md" />
                       </td>
 
-                      {/* Actions */}
+        
                       <td>
                         <div className="actions-cell">
                           {isAlreadyInvoiced ? (
@@ -355,7 +421,7 @@ function QuotationsView() {
         quotation={viewingQuotation}
         onGenerateInvoice={(qId) => setInvoiceGenQuotationId(qId)}
       />
-
+ 
       <CreateQuotationModal
         isOpen={isCreateQuotationOpen}
         onClose={() => {

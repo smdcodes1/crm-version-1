@@ -1,0 +1,446 @@
+
+.sale-modal-space {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.sale-top-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(245, 243, 255, 0.7) 0%, rgba(250, 245, 255, 0.3) 100%);
+    border-radius: 12px;
+    border: 1px solid #ede9fe;
+}
+
+.sale-stage-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.sale-text-xs-gray {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.sale-status-dropdown {
+    font-size: 0.75rem;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.25rem 0.625rem;
+    color: #374151;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+}
+
+.sale-status-dropdown:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.sale-created-date {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.sale-value-container {
+    text-align: right;
+}
+
+.sale-value-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+}
+
+.sale-value-number {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #111827;
+    letter-spacing: -0.025em;
+}
+/* Reminder Banner */
+.sale-reminder-card {
+    padding: 0.875rem;
+    background: rgba(254, 243, 199, 0.8);
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.sale-reminder-icon-wrap {
+    padding: 0.5rem;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.sale-reminder-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.sale-reminder-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.sale-reminder-heading {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #78350f;
+}
+
+.sale-reminder-pill {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    background: rgba(253, 230, 138, 0.8);
+    color: #78350f;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.sale-reminder-completed {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    background: #d1fae5;
+    color: #065f46;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.sale-reminder-note {
+    font-size: 0.75rem;
+    color: #92400e;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+}
+/* Grid Cards */
+.sale-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.sale-card {
+    padding: 0.875rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sale-card-heading {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.sale-card-heading svg {
+    color: #7c3aed;
+}
+
+.sale-service-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.sale-industry-row {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: #4b5563;
+}
+
+.sale-proposal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sale-proposal-toggle-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 1px solid;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sale-proposal-toggle-btn.shared {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+.sale-proposal-toggle-btn.shared:hover {
+    background: #d1fae5;
+}
+
+.sale-proposal-toggle-btn.pending {
+    background: #f3f4f6;
+    color: #4b5563;
+    border-color: #d1d5db;
+}
+
+.sale-proposal-toggle-btn.pending:hover {
+    background: #e5e7eb;
+}
+/* Contact Details */
+.sale-contact-flex {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.sale-text-sub {
+    font-size: 0.75rem;
+    color: #4b5563;
+}
+
+.sale-phone-mono {
+    font-size: 0.75rem;
+    color: #374151;
+    font-family: monospace;
+    margin-top: 0.125rem;
+}
+
+.sale-action-buttons-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sale-btn-action {
+    padding: 0.375rem 0.75rem;
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-decoration: none;
+    transition: background 0.15s;
+    cursor: pointer;
+}
+
+.sale-btn-action:hover {
+    background: #f9fafb;
+}
+
+.sale-btn-whatsapp {
+    padding: 0.375rem 0.75rem;
+    background: #059669;
+    color: #ffffff;
+    border: 1px solid #059669;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-decoration: none;
+    transition: background 0.15s;
+    cursor: pointer;
+}
+
+.sale-btn-whatsapp:hover {
+    background: #047857;
+}
+/* Remarks */
+.sale-remarks-text {
+    font-size: 0.75rem;
+    color: #374151;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    background: #ffffff;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin: 0;
+}
+
+.sale-remarks-empty {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-style: italic;
+    margin: 0;
+}
+
+/* Quotation CTA Banner */
+.sale-quotation-banner {
+    padding: 0.75rem;
+    background: rgba(245, 243, 255, 0.5);
+    border-radius: 12px;
+    border: 1px solid #ede9fe;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sale-quotation-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+.sale-quotation-left svg {
+    color: #7c3aed;
+}
+
+.sale-quotation-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6d28d9;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.sale-quotation-link:hover {
+    color: #5b21b6;
+    text-decoration: underline;
+}
+
+/* Modal Footer */
+.sale-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.sale-updated-timestamp {
+    font-size: 0.6875rem;
+    color: #9ca3af;
+}
+
+.sale-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sale-btn-close {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background: #ffffff;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sale-btn-close:hover {
+    background: #f3f4f6;
+}
+
+.sale-btn-edit {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: #7c3aed;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sale-btn-edit:hover {
+    background: #6d28d9;
+}
+
+/* Responsive Mobile Layout adjustments*/
+@media (min-width: 768px) {
+    .sale-grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 768px) {
+    
+    .sale-top-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .sale-value-container {
+        text-align: left;
+        width: 100%;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px dashed #e5e7eb;
+    }
+    .sale-contact-flex {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .sale-action-buttons-group {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .sale-modal-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+    .sale-footer-actions {
+        width: 100%;
+    }
+    .sale-footer-actions button {
+        flex: 1;
+        justify-content: center;
+    }
+}

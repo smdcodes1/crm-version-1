@@ -85,6 +85,36 @@ const handleSearch = async () => {
     setIsLoading(false);
   }
 };
+  const handleExportCSV = () => {
+    if (topCustomers.length === 0) return;
+
+    const headers = ['Rank', 'Company Name', 'Closed Deals', 'Total Revenue (INR)'];
+
+    const escapeCSV = (value) => {
+      if (value === undefined || value === null) return '""';
+      const str = String(value).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = topCustomers.map((cust, idx) => [
+      escapeCSV(idx + 1),
+      escapeCSV(cust.name),
+      escapeCSV(cust.deals),
+      escapeCSV(cust.revenue),
+    ]);
+
+    const csvContent = [headers.map((h) => `"${h}"`).join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.href = url;
+    link.setAttribute('download', `top-revenue-clients-${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
   return (
     <>
       <div className='title-header'>
@@ -150,34 +180,7 @@ const handleSearch = async () => {
           />
         </div>
       </div>
-      <div className='projects-controls5'>
-
-        <div className='projects-controls5-left'>
-          <input
-            type="date"
-            required
-            value={initialDate}
-            onChange={(e) => setInitialDate(e.target.value)}
-            className="projects-controls5-input"
-          />
-          <input
-            type="date"
-            required
-            value={finalDate}
-            onChange={(e) => setFinalDate(e.target.value)}
-            className="projects-controls5-input"
-          />
-        </div>
-         <button
-          type='button'
-          disabled={isLoading}
-          className='search-button-right'
-          onClick={handleSearch}
-        >
-          {isLoading ? 'Searching..' : "Search"}
-          {isLoading && <LoadingIndicator />}
-        </button>
-      </div>
+     
       <div className='reports-bottom-wrapper'>
         <div className='reports-chart-wrapper'>
           <BarChart
@@ -266,6 +269,34 @@ const handleSearch = async () => {
           </ul>
         </div>
       </div>
+      <div className='projects-controls5'>
+
+        <div className='projects-controls5-left'>
+          <input
+            type="date"
+            required
+            value={initialDate}
+            onChange={(e) => setInitialDate(e.target.value)}
+            className="projects-controls5-input"
+          />
+          <input
+            type="date"
+            required
+            value={finalDate}
+            onChange={(e) => setFinalDate(e.target.value)}
+            className="projects-controls5-input"
+          />
+        </div>
+         <button
+          type='button'
+          disabled={isLoading}
+          className='search-button-right'
+          onClick={handleSearch}
+        >
+          {isLoading ? 'Searching..' : "Search"}
+          {isLoading && <LoadingIndicator />}
+        </button>
+      </div>
       <div className='trc-card-container'>
         {/* Card Header */}
         <div className="trc-header">
@@ -274,7 +305,17 @@ const handleSearch = async () => {
             <p className="trc-subtitle">Accounts with highest closed deal volume</p>
           </div>
           <span className="trc-badge">
+            <button
+              id='export-reports-csv-btn'
+              title='Export top customers to CSV'
+              className='export-csv-btn'
+              disabled={topCustomers.length === 0}
+              onClick={handleExportCSV}
+            >
+              Export CSV
+            </button>
             {topCustomers.length} closed account(s)
+            
           </span>
         </div>
 
